@@ -1,10 +1,7 @@
 from functions import *
 np.bool = np.bool_
 from docplex.cp.model import *
-<<<<<<< HEAD
 import networkx as nx
-=======
->>>>>>> origin/get_part_activity
 
 
 df_name = pd.read_excel('../data/생관3-612-24-007_2024년 4월 일일생산계획 및 업체별 차종현황_Rev.00_24.03.28(확정).xlsx',
@@ -107,17 +104,13 @@ for name, subway_car in subway_car_dict.items():
         temp_date = date
 final_result = sorted(list(set(result1 + result2) - set(except_list)))
 print([item for item in final_result if 6 not in item and 8 not in item])
-<<<<<<< HEAD
 # edges = [item for item in final_result if 6 not in item and 8 not in item]
 edges = [item for item in final_result if 6 in item or 8 in item]
 # edges = [item for item in final_result]
-=======
->>>>>>> origin/get_part_activity
 # final_result2 = sorted(list(set(result2) - set(except_list)))
 # print([item for item in final_result2 if 6 not in item and 8 not in item])
 
 
-<<<<<<< HEAD
 
 # 그래프 생성
 G = nx.DiGraph()  # 유향 그래프
@@ -130,5 +123,3 @@ print("이어지는 관계 (연결된 컴포넌트):", connected_components)
 # 2. 순환 관계 확인 (Cycles)
 cycles = list(nx.simple_cycles(G))  # 단순 사이클 탐색
 print("순환 관계 (사이클):", cycles)
-=======
->>>>>>> origin/get_part_activity
