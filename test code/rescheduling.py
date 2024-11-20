@@ -106,10 +106,10 @@ final_result = sorted(list(set(result1 + result2) - set(except_list)))
 print([item for item in final_result if 6 not in item and 8 not in item])
 # edges = [item for item in final_result if 6 not in item and 8 not in item]
 edges = [item for item in final_result if 6 in item or 8 in item]
+# edges = [item for item in final_result if 6 == item[1] or 8 == item[1]]
 # edges = [item for item in final_result]
 # final_result2 = sorted(list(set(result2) - set(except_list)))
 # print([item for item in final_result2 if 6 not in item and 8 not in item])
-
 
 
 # 그래프 생성
@@ -119,6 +119,9 @@ G.add_edges_from(edges)
 # 1. 이어지는 관계 확인 (Connected Components)
 connected_components = list(nx.weakly_connected_components(G))  # 약 연결 컴포넌트
 print("이어지는 관계 (연결된 컴포넌트):", connected_components)
+
+connected_components = list(nx.strongly_connected_components(G))  # 약 연결 컴포넌트
+print("이어지는 관계 (강 연결된 컴포넌트):", [comp for comp in connected_components if len(comp) > 1])
 
 # 2. 순환 관계 확인 (Cycles)
 cycles = list(nx.simple_cycles(G))  # 단순 사이클 탐색
