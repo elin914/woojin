@@ -24,67 +24,6 @@ subway_car_dict = {}  # {name: SubwayCar 객체}
 subway_car_dict = create_subway_car_dict(df_data, subway_car_dict, pd.to_datetime('2024-04-01'))
 
 process_list = list(df_data.index.drop_duplicates())
-#
-# process_list = [
-#     "흡음재 취부", "흡음재 씰링/검사/수정", "측창취부/T-BOLT 삽입", "실내/상하 CABLE HARNESS 취부", "실내/상하 배선",
-#     "실내 배선 작업", "객실도어 취부", "리무벌/파티션 프레임 취부", "객실도어 취부 검사", "하부덕트검사\n (D+1~4일차 조정작업)",
-#     "실내 배선 검사", "AIR DUCT MODULE 취부", "CENTER GRILL 취부", "AIR DUCT MODULE 취부 검사", "CAB MODULE 취부(TC)",
-#     "배관 MODULE 취부", "배전반 취부 및 배선작업", "CENTER PIVOT 취부", "COUPLER 취부", "제동기기 취부 및 누설검사",
-#     "운전실 내장판 취부", "D+5~13일차 조정작업", "ROOF 내장판 취부", "운전실 캐비넷 취부(TC)", "상하 전장기기 취부 결선", "SIDE 내장판 취부",
-#     "운전실 배전반 결선(TC)", "AIR CON 취부", "내장판 조정작업(완료)", "내장판 취부 검사", "운전실 DOOR 취부(TC)", "전장기기 취부 결선 완료",
-#     "운전실 전장기기 취부 결선(TC)", "도통검사(량단위 시험기)", "도통 자체 검사(완료)", "도통 검사 수정", "도통입회검사/내전압자체검사",
-#     "내전압 입회검사", "수정작업 및 점검커버 복구", "D+17~20일차 조정작업", "전장취부, 결선 복구 완료", "실내 조정 및 실내·외 설비 완료",
-#     "전장품 취부 입회검사", "복구 및 수정작업", "실내 설비 입회검사", "대차차입 전검사 / 대차차입", "대차 전장품 취부 결선 & 마무리", "대차차입 후 검사"
-# ]
-
-# process_dict = {
-#     'A': ['상하 전장기기 취부 결선', '내장판 조정작업(완료)'],
-#     'B': ['리무벌/파티션 프레임 취부', '실내 배선 검사', 'AIR DUCT MODULE 취부', 'CENTER GRILL 취부', 'AIR DUCT MODULE 취부 검사',
-#           '배관 MODULE 취부', 'CENTER PIVOT 취부', 'COUPLER 취부', '제동기기 취부 및 누설검사', 'D+5~13일차 조정작업',
-#           'ROOF 내장판 취부', 'SIDE 내장판 취부', 'AIR CON 취부', '내장판 취부 검사', '전장기기 취부 결선 완료', '운전실 전장기기 취부 결선(TC)'],
-#     'C': ['흡음재 취부', '흡음재 씰링/검사/수정', '측창취부/T-BOLT 삽입', '실내/상하 CABLE HARNESS 취부', '실내/상하 배선',
-#           '실내 배선 작업', '객실도어 취부', '객실도어 취부 검사', '하부덕트검사\n (D+1~4일차 조정작업)', 'CAB MODULE 취부(TC)',
-#           '배전반 취부 및 배선작업', '운전실 내장판 취부', '운전실 캐비넷 취부(TC)', '운전실 배전반 결선(TC)', '운전실 DOOR 취부(TC)',
-#           '도통검사(량단위 시험기)', '도통 자체 검사(완료)', '도통 검사 수정', '도통입회검사/내전압자체검사', '내전압 입회검사',
-#           '수정작업 및 점검커버 복구', 'D+17~20일차 조정작업', '전장취부, 결선 복구 완료', '실내 조정 및 실내·외 설비 완료',
-#           '전장품 취부 입회검사', '복구 및 수정작업', '실내 설비 입회검사', '대차차입 전검사 / 대차차입', '대차 전장품 취부 결선 & 마무리', '대차차입 후 검사']
-# }
-# #
-# print(list(df_data.index.drop_duplicates()) == process_list)
-# max_index_dict = {}
-# for key, sub_list in process_dict.items():
-#     indices = [process_list.index(item) for item in sub_list if item in process_list]
-#     print(key, indices == sorted(indices))
-#     print(indices)
-#     print(sub_list)
-#     max_index_dict[key] = max(indices)
-#
-# max_index = sorted(max_index_dict.values())[-2] + 1
-# max_key = [key for key in max_index_dict if max_index_dict[key] == sorted(max_index_dict.values())[-1]][0]
-# print(max_key, max_index)
-#
-# process_dict['D'] = process_dict[max_key][process_dict[max_key].index(process_list[max_index]):]
-# process_dict[max_key] = process_dict[max_key][:process_dict[max_key].index(process_list[max_index])]
-#
-# indices_dict = {
-#     key: [process_list.index(item) for item in sub_list if item in process_list]
-#     for key, sub_list in process_dict.items()
-# }
-
-# for name, subway_car in subway_car_dict.items():
-#     subway_car.min_index_dict = dict.fromkeys(process_dict.keys(), None)
-#     subway_car.min_date_index = process_list.index(min(subway_car.activity_dict.items(), key=lambda item: item[1])[0])
-#     for activity_name, date in subway_car.activity_dict.items():
-#         index = process_list.index(activity_name)
-#         for key in indices_dict:
-#             if index in indices_dict[key]:
-#                 if subway_car.min_index_dict[key] is None or subway_car.min_index_dict[key] > index:
-#                     subway_car.min_index_dict[key] = index
-#
-#     print(name, subway_car.min_date_index, subway_car.min_index_dict, subway_car.min_date_index == min(filter(lambda x: x is not None, subway_car.min_index_dict.values())))
-# # 가장 작은 값은 optional=False 로 해야겠네
-# print(len(list(subway_car_dict.keys())))
-# #일단 33 34 35 다음인 36부터가 전체 공정인듯
 
 result1 = []
 result2 = []
@@ -100,6 +39,7 @@ except_count1 = {}   # except_list1에 대한 예외 횟수 추적
 except_count2 = {}   # except_list2에 대한 예외 횟수 추적
 
 process_count_dict = {process: 0 for process in process_list}
+max_date = 0
 
 for name, subway_car in subway_car_dict.items():
     temp_name_date = []
@@ -108,6 +48,7 @@ for name, subway_car in subway_car_dict.items():
             continue
         activity_name = process
         date = subway_car.activity_dict[activity_name]
+        max_date = max(date, max_date)
         process_count_dict[process] += 1
         if temp_name_date == []:
             pass
@@ -141,7 +82,6 @@ for name, subway_car in subway_car_dict.items():
                         temp_list2.append(idx_pair)
         temp_name_date.append((activity_name, date))
 
-
 # 결론 1: result1 + result2에서 except_list와 2번 이상 어긋난 항목 제외
 final_result1 = sorted(list((set(result1 + result2)) - set(except_list)))
 # final_result1 = sorted(list((set(result1 + result2)) - set(temp_list)))
@@ -157,31 +97,83 @@ final_result3 = sorted(list(set(result2) - set(except_list1)))
 edges1 = [item for item in final_result1]
 edges2 = [item for item in final_result2]
 
-# 그래프 생성
 G = nx.DiGraph()  # 유향 그래프
 G.add_edges_from(edges1)
 
-# 1. 이어지는 관계 확인 (Connected Components)
 connected_components = list(nx.weakly_connected_components(G))  # 약 연결 컴포넌트
 sorted_components1 = [sorted(list(component)) for component in connected_components]
 
-# 그래프 생성
 G = nx.DiGraph()  # 유향 그래프
 G.add_edges_from(edges2)
 
-# 1. 이어지는 관계 확인 (Connected Components)
 connected_components = list(nx.weakly_connected_components(G))  # 약 연결 컴포넌트
 sorted_components2 = [sorted(list(component)) for component in connected_components]
 
 TC_process_list = [process_list.index(process)for (process, value) in process_count_dict.items() if value < max(process_count_dict.values()) / 2]
 
-print("선후행 관계:", sorted_components1)
+sequence_constraint = [
+    [element for element in inner_list if element not in TC_process_list]
+    for inner_list in sorted_components1
+]
+
+# 휴리스틱
+sequence_constraint[2].insert(sequence_constraint[2].index(17), 16)
+
+sequence_constraint_TC = sorted_components1
+
+same_sequence_constraint = [
+    [element for element in inner_list if element not in TC_process_list]
+    for inner_list in sorted_components2
+]
+same_sequence_constraint = [inner_list for inner_list in same_sequence_constraint if len(inner_list) > 1]
+
+same_sequence_constraint_TC = sorted_components2
+
+print('선후행 제약:', sequence_constraint)
 print('---------------------------')
-print("동시 제약:", sorted_components2)
+print('동시 작업 제약:', same_sequence_constraint)
 print('---------------------------')
-print("TC 작업 리스트:", TC_process_list)
+print('TC 전용 작업:', TC_process_list)
+print('---------------------------')
+print('선후행 제약 with TC:', sequence_constraint_TC)
+print('---------------------------')
+print('동시 작업 제약 with TC:', same_sequence_constraint_TC)
+print('---------------------------')
+
+#
+# indices_dict = {
+#     'A': sequence_constraint[0],
+#     'B': sequence_constraint[1],
+#     'C': sequence_constraint[2],
+#     'D': sequence_constraint[3],
+# }
+# for name, subway_car in subway_car_dict.items():
+#     subway_car.min_index_dict = dict.fromkeys(indices_dict.keys(), None)
+#     subway_car.min_date_index = process_list.index(min(subway_car.activity_dict.items(), key=lambda item: item[1])[0])
+#     for activity_name, date in subway_car.activity_dict.items():
+#         index = process_list.index(activity_name)
+#         for key in indices_dict:
+#             if index in indices_dict[key]:
+#                 if subway_car.min_index_dict[key] is None or subway_car.min_index_dict[key] > index:
+#                     subway_car.min_index_dict[key] = index
+#
+#     if not subway_car.min_date_index == min(filter(lambda x: x is not None, subway_car.min_index_dict.values())):
+#         print(name, subway_car.min_date_index, subway_car.min_index_dict, subway_car.min_date_index == min(filter(lambda x: x is not None, subway_car.min_index_dict.values())))
+# # 가장 작은 값은 optional=False 로 해야겠네
+# print(len(list(subway_car_dict.keys())))
 
 
+
+# 제약 조건
+## 앞선 작업이 먼저 이루어져야한다
+## 하나의 작업은 하루에 차 두개까지 수행 가능
+## 하나의 차가 하루에 두 작업도 수행 가능
+## 동시 작업이 있으면 무조건 같은 날 수행 << 묶어서 인풋 넣기
+## 전체 작업 개수 제한 << 무조건 14개만 결과뽑기
+## TC에서 16번 작업은 2번째 27번 작업이 끝나기 전에 끝나야함
+
+
+mdl = CpoModel()
 
 
 
