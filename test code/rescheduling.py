@@ -23,17 +23,19 @@ df_data = clean_column_names(df_data)
 subway_car_dict = {}  # {name: SubwayCar 객체}
 subway_car_dict = create_subway_car_dict(df_data, subway_car_dict, pd.to_datetime('2024-04-01'))
 
-process_list = [
-    "흡음재 취부", "흡음재 씰링/검사/수정", "측창취부/T-BOLT 삽입", "실내/상하 CABLE HARNESS 취부", "실내/상하 배선",
-    "실내 배선 작업", "객실도어 취부", "리무벌/파티션 프레임 취부", "객실도어 취부 검사", "하부덕트검사\n (D+1~4일차 조정작업)",
-    "실내 배선 검사", "AIR DUCT MODULE 취부", "CENTER GRILL 취부", "AIR DUCT MODULE 취부 검사", "CAB MODULE 취부(TC)",
-    "배관 MODULE 취부", "배전반 취부 및 배선작업", "CENTER PIVOT 취부", "COUPLER 취부", "제동기기 취부 및 누설검사",
-    "운전실 내장판 취부", "D+5~13일차 조정작업", "ROOF 내장판 취부", "운전실 캐비넷 취부(TC)", "상하 전장기기 취부 결선", "SIDE 내장판 취부",
-    "운전실 배전반 결선(TC)", "AIR CON 취부", "내장판 조정작업(완료)", "내장판 취부 검사", "운전실 DOOR 취부(TC)", "전장기기 취부 결선 완료",
-    "운전실 전장기기 취부 결선(TC)", "도통검사(량단위 시험기)", "도통 자체 검사(완료)", "도통 검사 수정", "도통입회검사/내전압자체검사",
-    "내전압 입회검사", "수정작업 및 점검커버 복구", "D+17~20일차 조정작업", "전장취부, 결선 복구 완료", "실내 조정 및 실내·외 설비 완료",
-    "전장품 취부 입회검사", "복구 및 수정작업", "실내 설비 입회검사", "대차차입 전검사 / 대차차입", "대차 전장품 취부 결선 & 마무리", "대차차입 후 검사"
-]
+process_list = list(df_data.index.drop_duplicates())
+#
+# process_list = [
+#     "흡음재 취부", "흡음재 씰링/검사/수정", "측창취부/T-BOLT 삽입", "실내/상하 CABLE HARNESS 취부", "실내/상하 배선",
+#     "실내 배선 작업", "객실도어 취부", "리무벌/파티션 프레임 취부", "객실도어 취부 검사", "하부덕트검사\n (D+1~4일차 조정작업)",
+#     "실내 배선 검사", "AIR DUCT MODULE 취부", "CENTER GRILL 취부", "AIR DUCT MODULE 취부 검사", "CAB MODULE 취부(TC)",
+#     "배관 MODULE 취부", "배전반 취부 및 배선작업", "CENTER PIVOT 취부", "COUPLER 취부", "제동기기 취부 및 누설검사",
+#     "운전실 내장판 취부", "D+5~13일차 조정작업", "ROOF 내장판 취부", "운전실 캐비넷 취부(TC)", "상하 전장기기 취부 결선", "SIDE 내장판 취부",
+#     "운전실 배전반 결선(TC)", "AIR CON 취부", "내장판 조정작업(완료)", "내장판 취부 검사", "운전실 DOOR 취부(TC)", "전장기기 취부 결선 완료",
+#     "운전실 전장기기 취부 결선(TC)", "도통검사(량단위 시험기)", "도통 자체 검사(완료)", "도통 검사 수정", "도통입회검사/내전압자체검사",
+#     "내전압 입회검사", "수정작업 및 점검커버 복구", "D+17~20일차 조정작업", "전장취부, 결선 복구 완료", "실내 조정 및 실내·외 설비 완료",
+#     "전장품 취부 입회검사", "복구 및 수정작업", "실내 설비 입회검사", "대차차입 전검사 / 대차차입", "대차 전장품 취부 결선 & 마무리", "대차차입 후 검사"
+# ]
 
 # process_dict = {
 #     'A': ['상하 전장기기 취부 결선', '내장판 조정작업(완료)'],
@@ -84,7 +86,6 @@ process_list = [
 # print(len(list(subway_car_dict.keys())))
 # #일단 33 34 35 다음인 36부터가 전체 공정인듯
 
-
 result1 = []
 result2 = []
 temp_list =[]
@@ -98,6 +99,8 @@ except_count = {}    # 전체 예외 횟수 추적
 except_count1 = {}   # except_list1에 대한 예외 횟수 추적
 except_count2 = {}   # except_list2에 대한 예외 횟수 추적
 
+process_count_dict = {process: 0 for process in process_list}
+
 for name, subway_car in subway_car_dict.items():
     temp_name_date = []
     for process in process_list:
@@ -105,6 +108,7 @@ for name, subway_car in subway_car_dict.items():
             continue
         activity_name = process
         date = subway_car.activity_dict[activity_name]
+        process_count_dict[process] += 1
         if temp_name_date == []:
             pass
         else:
@@ -140,24 +144,18 @@ for name, subway_car in subway_car_dict.items():
 
 # 결론 1: result1 + result2에서 except_list와 2번 이상 어긋난 항목 제외
 final_result1 = sorted(list((set(result1 + result2)) - set(except_list)))
+# final_result1 = sorted(list((set(result1 + result2)) - set(temp_list)))
 
 # 결론 2: result1에서 except_list2와 2번 이상 어긋난 항목 제외
 final_result2 = sorted(list(set(result1) - set(except_list2)))
+# final_result2 = sorted(list(set(result1) - set(temp_list2)))
 
 # 결론 3: result2에서 except_list1과 2번 이상 어긋난 항목 제외
 final_result3 = sorted(list(set(result2) - set(except_list1)))
+# final_result3 = sorted(list(set(result2) - set(temp_list1)))
 
-# final_result = final_result1
-
-# print([item for item in final_result if 6 not in item and 8 not in item])
-# edges1 = [item for item in final_result if 6 not in item and 8 not in item]
-# edges2 = [item for item in final_result if 6 in item or 8 in item]
-# edges = [item for item in final_result if 6 == item[1] or 8 == item[1]]
 edges1 = [item for item in final_result1]
 edges2 = [item for item in final_result2]
-edges3 = [item for item in final_result3]
-# print([item for item in final_result2 if 6 not in item and 8 not in item])
-
 
 # 그래프 생성
 G = nx.DiGraph()  # 유향 그래프
@@ -165,9 +163,7 @@ G.add_edges_from(edges1)
 
 # 1. 이어지는 관계 확인 (Connected Components)
 connected_components = list(nx.weakly_connected_components(G))  # 약 연결 컴포넌트
-print("이어지는 관계 (연결된 컴포넌트):", connected_components)
-
-print('---------------------------')
+sorted_components1 = [sorted(list(component)) for component in connected_components]
 
 # 그래프 생성
 G = nx.DiGraph()  # 유향 그래프
@@ -175,14 +171,17 @@ G.add_edges_from(edges2)
 
 # 1. 이어지는 관계 확인 (Connected Components)
 connected_components = list(nx.weakly_connected_components(G))  # 약 연결 컴포넌트
-print("이어지는 관계 (연결된 컴포넌트):", connected_components)
+sorted_components2 = [sorted(list(component)) for component in connected_components]
 
+TC_process_list = [process_list.index(process)for (process, value) in process_count_dict.items() if value < max(process_count_dict.values()) / 2]
+
+print("선후행 관계:", sorted_components1)
 print('---------------------------')
+print("동시 제약:", sorted_components2)
+print('---------------------------')
+print("TC 작업 리스트:", TC_process_list)
 
-# 그래프 생성
-G = nx.DiGraph()  # 유향 그래프
-G.add_edges_from(edges3)
 
-# 1. 이어지는 관계 확인 (Connected Components)
-connected_components = list(nx.weakly_connected_components(G))  # 약 연결 컴포넌트
-print("이어지는 관계 (연결된 컴포넌트):", connected_components)
+
+
+
