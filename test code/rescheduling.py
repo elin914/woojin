@@ -129,39 +129,53 @@ same_sequence_constraint = [inner_list for inner_list in same_sequence_constrain
 
 same_sequence_constraint_TC = sorted_components2
 
+
+indices_dict = {
+    'A': sequence_constraint[0],
+    'B': sequence_constraint[1],
+    'C': sequence_constraint[2],
+    'D': sequence_constraint[3],
+}
+for name, subway_car in subway_car_dict.items():
+    subway_car.min_index_dict = dict.fromkeys(indices_dict.keys(), None)
+    subway_car.min_date_index = process_list.index(min(subway_car.activity_dict.items(), key=lambda item: item[1])[0])
+    for activity_name, date in subway_car.activity_dict.items():
+        index = process_list.index(activity_name)
+        for key in indices_dict:
+            if index in indices_dict[key]:
+                if subway_car.min_index_dict[key] is None or subway_car.min_index_dict[key] > index:
+                    subway_car.min_index_dict[key] = index
+
+    if not subway_car.min_date_index == min(filter(lambda x: x is not None, subway_car.min_index_dict.values())) or subway_car.min_date_index == 11:
+        print(name, subway_car.min_date_index, subway_car.min_index_dict, subway_car.min_date_index == min(filter(lambda x: x is not None, subway_car.min_index_dict.values())))
+# 가장 작은 값은 optional=False 로 해야겠네
+print(len(list(subway_car_dict.keys())))
+
+start_after_10_end_before_27 = sequence_constraint[1]
+sequence_constraint = sequence_constraint[0] + sequence_constraint[2] + sequence_constraint[3]
+
+start_after_10_end_before_27_TC = sequence_constraint_TC[1] + [16]
+sequence_constraint_TC = sequence_constraint_TC[0] + sequence_constraint_TC[2] + sequence_constraint_TC[3]
+
+print('TC 전용 작업:', TC_process_list)
+print('---------------------------')
 print('선후행 제약:', sequence_constraint)
+print('---------------------------')
+print('10 후 27 이전:', start_after_10_end_before_27)
 print('---------------------------')
 print('동시 작업 제약:', same_sequence_constraint)
 print('---------------------------')
-print('TC 전용 작업:', TC_process_list)
+print('작업이 모두 존재하는가?', sorted(sequence_constraint + start_after_10_end_before_27) == sorted(list(set(range(len(process_list))) - set(TC_process_list))))
+print('---------------------------')
 print('---------------------------')
 print('선후행 제약 with TC:', sequence_constraint_TC)
 print('---------------------------')
+print('10 후 27 이전:', start_after_10_end_before_27_TC)
+print('---------------------------')
 print('동시 작업 제약 with TC:', same_sequence_constraint_TC)
 print('---------------------------')
-
-#
-# indices_dict = {
-#     'A': sequence_constraint[0],
-#     'B': sequence_constraint[1],
-#     'C': sequence_constraint[2],
-#     'D': sequence_constraint[3],
-# }
-# for name, subway_car in subway_car_dict.items():
-#     subway_car.min_index_dict = dict.fromkeys(indices_dict.keys(), None)
-#     subway_car.min_date_index = process_list.index(min(subway_car.activity_dict.items(), key=lambda item: item[1])[0])
-#     for activity_name, date in subway_car.activity_dict.items():
-#         index = process_list.index(activity_name)
-#         for key in indices_dict:
-#             if index in indices_dict[key]:
-#                 if subway_car.min_index_dict[key] is None or subway_car.min_index_dict[key] > index:
-#                     subway_car.min_index_dict[key] = index
-#
-#     if not subway_car.min_date_index == min(filter(lambda x: x is not None, subway_car.min_index_dict.values())):
-#         print(name, subway_car.min_date_index, subway_car.min_index_dict, subway_car.min_date_index == min(filter(lambda x: x is not None, subway_car.min_index_dict.values())))
-# # 가장 작은 값은 optional=False 로 해야겠네
-# print(len(list(subway_car_dict.keys())))
-
+print('작업이 모두 존재하는가?', sorted(sequence_constraint_TC + start_after_10_end_before_27_TC) == sorted(range(len(process_list))))
+print('---------------------------')
 
 
 # 제약 조건
@@ -172,6 +186,9 @@ print('---------------------------')
 ## 전체 작업 개수 제한 << 무조건 14개만 결과뽑기
 ## TC에서 16번 작업은 2번째 27번 작업이 끝나기 전에 끝나야함
 
+
+## B 작업 시키는걸 어디까지 할지 정하기 << 기준의 부재
+# 27이 있는 애들은 다 B 작업을 했나?
 
 mdl = CpoModel()
 
