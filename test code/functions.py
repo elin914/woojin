@@ -15,8 +15,10 @@ class SubwayCar:
     def __init__(self, name):
         self.name = name
         self.activity_dict = dict()
-        self.min_index_dict = dict()
+        self.activity_indices = []
+        self.special_activity_indices = []
         self.min_date_index = None
+        self.min_date_index_wo_special = None
 
     def add_activity(self, activity_name, date):
         if activity_name not in self.activity_dict:
@@ -40,3 +42,14 @@ def create_subway_car_dict(df_data, subway_car_dict, start_date):
                 # subway_car_dict[car_name].add_activity(activity_name, start_date + pd.Timedelta(days=date - 1))
                 subway_car_dict[car_name].add_activity(activity_name, temp.index(date))
     return subway_car_dict
+
+
+def is_sublist(sublist, main_list):
+    sublist_length = len(sublist)
+    main_list_length = len(main_list)
+
+    # 주어진 리스트의 모든 연속된 부분 확인
+    for i in range(main_list_length - sublist_length + 1):
+        if main_list[i:i + sublist_length] == sublist:
+            return True
+    return False
