@@ -86,16 +86,10 @@ for name, subway_car in subway_car_dict.items():
 performance_result = process_count_dict[process_list[-1]]
 max_date += 1
 
-# 결론 1: result1 + result2에서 except_list와 2번 이상 어긋난 항목 제외
-# final_result1 = sorted(list((set(result1 + result2)) - set(except_list)))
 final_result1 = sorted(list((set(result1 + result2)) - set(temp_list)))
 
-# 결론 2: result1에서 except_list2와 2번 이상 어긋난 항목 제외
-# final_result2 = sorted(list(set(result1) - set(except_list2)))
 final_result2 = sorted(list(set(result1) - set(temp_list2)))
 
-# 결론 3: result2에서 except_list1과 2번 이상 어긋난 항목 제외
-# final_result3 = sorted(list(set(result2) - set(except_list1)))
 final_result3 = sorted(list(set(result2) - set(temp_list1)))
 
 edges1 = [item for item in final_result1]
@@ -121,7 +115,6 @@ sequence_constraint = [
     for inner_list in sorted_components1
 ]
 
-# 휴리스틱
 sequence_constraint_TC = sorted_components1
 
 same_sequence_constraint = [
@@ -168,13 +161,8 @@ print('---------------------------')
 ## 앞선 작업이 먼저 이루어져야한다
 ## 하나의 작업은 하루에 차 두개까지 수행 가능
 ## 하나의 차가 하루에 두 작업도 수행 가능
-## 동시 작업이 있으면 무조건 같은 날 수행 << 묶어서 인풋 넣기
-## 전체 작업 개수 제한 << 무조건 14개만 결과뽑기
-## TC에서 16번 작업은 2번째 27번 작업이 끝나기 전에 끝나야함
-
-
-## B 작업 시키는걸 어디까지 할지 정하기 << 기준의 부재
-# 27이 있는 애들은 다 B 작업을 했나?
+## 동시 작업이 있으면 무조건 같은 날 수행 << 묶어서 사용
+## 6, 8, 16번 작업은 2번째 27번 작업이 끝나기 전에 끝나야함
 
 for name, subway_car in subway_car_dict.items():
     subway_car.min_date_index = min([process_list.index(process) for process in list(subway_car.activity_dict)])
@@ -187,12 +175,9 @@ for name, subway_car in subway_car_dict.items():
     else:
         subway_car.special_activity_indices = start_after_10_end_before_27
 
-    # print([process_list.index(process) for process in list(subway_car.activity_dict)])
-
 mdl = CpoModel()
 
 step_by_process_dict = {}
-print(same_sequence_constraint_list_TC)
 for index in range(len(process_list)):
     if index in [31, 33] or index not in same_sequence_constraint_list_TC:
         step_by_process_dict[index] = step_at(0, 0)
@@ -204,7 +189,7 @@ for name, _ in subway_car_dict.items():
 subway_car_interval_dict = {}
 subway_car_special_interval_dict = {}
 obj = 0
-obj_integer = integer_var(min=14, max=15)
+obj_integer = integer_var(min=0, max=15)
 for name, subway_car in subway_car_dict.items():
     interval_dict = {}
     special_interval_dict = {}
@@ -284,10 +269,6 @@ for name, subway_car in subway_car_dict.items():
     for index, value in special_interval_dict.items():
         mdl.add(end_before_start(value, interval_dict[28]))
 
-
-    # print(name, interval_dict)
-    # print(name, special_interval_dict)
-
 mdl.add(obj == obj_integer)
 mdl.add(mdl.maximize(obj))
 for index in range(len(process_list)):
@@ -302,5 +283,5 @@ result = 0
 for name, interval_dict in subway_car_interval_dict.items():
     result += sol.get_var_solution(interval_dict[46]).presence
 
-print(f"실적 결과: {performance_result}대 완성, 최적화 결과: {result}대 완성")
+print(f"실적 결과: 대차차입 {performance_result}칸, 최적화 결과: 대차 차입 {result}칸")
 
