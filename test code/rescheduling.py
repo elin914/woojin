@@ -279,9 +279,13 @@ for name, _ in subway_car_dict.items():
     mdl.add(step_by_subway_car_dict[name] <= 2)
 
 sol = mdl.solve()
-result = 0
-for name, interval_dict in subway_car_interval_dict.items():
-    result += sol.get_var_solution(interval_dict[46]).presence
 
-print(f"실적 결과: 대차차입 {performance_result}칸, 최적화 결과: 대차 차입 {result}칸")
-
+if sol:
+    print("최적화 결과 출력 완료")
+    result = 0
+    for name, interval_dict in subway_car_interval_dict.items():
+        result += sol.get_var_solution(interval_dict[46]).presence
+    print(f"실적 결과: '대차차입 후 검사' {performance_result}칸, 최적화 결과: '대차차입 후 검사' {result}칸")
+else:
+    print("최적화 결과 출력 실패")
+    print("최적화 결과: 해가 존재하지 않음")
