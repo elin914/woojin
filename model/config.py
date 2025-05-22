@@ -6,10 +6,12 @@ import time
 def create_config():
     config = dict()
 
+    config['run_time'] = 600
+
     config['use_API'] = False
     config['API_ID'] = None
-    config['data_file_path'] = '../data/생관3-612-24-007_2024년 4월 일일생산계획 및 업체별 차종현황_Rev.00_24.03.28(확정).xlsx'
-    config['extra_data_file_path'] = None
+    config['data_file_path'] = '../data/생관3-612-24-031_2025년 1월 일일생산계획 및 업체별 차종현황_Rev.00_24.12.31(작성중).xlsx'
+    # config['extra_data_file_path'] = '../data/02.의장·전기·기장 제작 계획 및 실적(24년 12월 예상실적).xlsm'
 
     # 결과 저장
     config['ymd'] = time.strftime('%Y%m%d')
