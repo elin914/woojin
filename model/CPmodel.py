@@ -16,19 +16,25 @@ class CPmodel:
         self.model = CpoModel()
         self.search_start_time = None
         self.solution = None
+        self.start_time_index = 0
+        self.end_time_index = 31
 
         self.df_process = pd.DataFrame()
         self.df_vehicle = pd.DataFrame()
         self.process_list = list()
         self.operation_list = list()
-        self.test_opeartion_list = list()
+        self.test_operation_list = list()
         self.TC_operation_list = list()
         self.operation_dict = dict()
-        self.same_sequence_constarint = list()
+        self.same_sequence_constraint = list()
         self.calendar = None
         self.vehicle_dict = dict()
 
         self.operation0_dict = dict()  # vehicle_name: date
+
+        self.max_load = self.model.integer_var(0, 50)
+        self.load_step_function = self.model.step_at(0, 0)
+        self.operation_var_dict_by_vehicle_operation = dict()
 
     def get_data(self):
         if self.config['use_API']:
@@ -44,5 +50,6 @@ class CPmodel:
         define_object_functions(self)
         print("Define Object Functions Completed")
         self.search_start_time = time.time()
-        self.solution = self.model.start_search(TimeLimit=self.config['run_time'])
+        # self.solution = self.model.start_search(TimeLimit=self.config['run_time'])
+        self.solution = self.model.solve(TimeLimit=self.config['run_time'])
         save_results(self)

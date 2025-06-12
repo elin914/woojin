@@ -16,9 +16,9 @@ def get_data_from_xlsx(self):
 
     self.process_list = list(self.df_process['세부공정명'])
     self.operation_list = ["operation" + str(i) for i in range(len(self.process_list))]
-    self.test_opeartion_list = [1, 8, 9, 10, 13, 19, 29, 33, 34, 36, 37, 42, 44, 47]
+    self.test_operation_list = [1, 8, 9, 10, 13, 19, 29, 33, 34, 36, 37, 42, 44, 47]
     self.TC_operation_list = [14, 20, 23, 26, 30, 32]
-    self.operation_dict = {"operation" + str(i): Operation(row['세부공정명'], i, i in self.test_opeartion_list,
+    self.operation_dict = {"operation" + str(i): Operation(row['세부공정명'], i, i in self.test_operation_list,
                                                            i in self.TC_operation_list, row['담당공정'])
                            for i, row in self.df_process.iterrows()}
     self.same_sequence_constraint = [[1, 2], [38, 39, 40, 41], [42, 43], [46, 47]]
@@ -27,7 +27,8 @@ def get_data_from_xlsx(self):
     self.calendar.holiday = [1, 5, 12, 19, 26, 28, 29, 30]
     self.calendar.saturday = [4, 11, 18, 25]
     self.calendar.index_to_day_calendar_dict = {i: pd.to_datetime('2025-01-01') + pd.Timedelta(days=day - 1)
-                                                for i, day in enumerate(d for d in range(1, 32)
+                                                for i, day in enumerate(d for d in range(self.start_time_index + 1,
+                                                                                         self.end_time_index + 1)
                                                                         if d not in self.calendar.holiday)}
     self.calendar.day_to_index_calendar_dict = \
         {value: key for key, value in self.calendar.index_to_day_calendar_dict.items()}
