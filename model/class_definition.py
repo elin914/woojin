@@ -8,7 +8,7 @@ class Operation:
         # self.position = position
         self.duration = 1
         self.resource = 1
-        self.left_vehicle_list = list()
+        # self.left_vehicle_list = list()
 
 
 class Calendar:
@@ -22,9 +22,10 @@ class Calendar:
 class Vehicle:
     def __init__(self, vehicle_name, type_TC):
         self.vehicle_name = vehicle_name
+        self.order = None
         self.type_TC = type_TC
         self.operation_dict = dict()
-        self.left_operation_list = list()
+        self.operation_list = list()
 
     def add_operation(self, operation, date):
         if operation not in self.operation_dict:

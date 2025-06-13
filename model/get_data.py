@@ -27,9 +27,11 @@ def get_data_from_xlsx(self):
     self.calendar.holiday = [1, 5, 12, 19, 26, 28, 29, 30]
     self.calendar.saturday = [4, 11, 18, 25]
     self.calendar.index_to_day_calendar_dict = {i: pd.to_datetime('2025-01-01') + pd.Timedelta(days=day - 1)
-                                                for i, day in enumerate(d for d in range(self.start_time_index + 1,
-                                                                                         self.end_time_index + 1)
-                                                                        if d not in self.calendar.holiday)}
+                                                for i, day in enumerate(range(self.start_time_index + 1,
+                                                                                         self.end_time_index + 1))}
+                                                # for i, day in enumerate(d for d in range(self.start_time_index + 1,
+                                                #                                          self.end_time_index + 1)
+                                                #                         if d not in self.calendar.holiday)}
     self.calendar.day_to_index_calendar_dict = \
         {value: key for key, value in self.calendar.index_to_day_calendar_dict.items()}
 
@@ -51,9 +53,18 @@ def get_data_from_xlsx(self):
                 self.vehicle_dict[vehicle_name].add_operation(
                     self.operation_list[self.process_list.index(operation_name)], date)
 
+    vehicle_order_dict = dict()
     for vehicle_name, vehicle in self.vehicle_dict.items():
         if 'operation0' in vehicle.operation_dict:
             self.operation0_dict[vehicle_name] = vehicle.operation_dict['operation0']
+        min_operation_index = len(self.operation_list)
         for operation in vehicle.operation_dict:
-            self.operation_dict[operation].left_vehicle_list.append(vehicle_name)
-            vehicle.left_operation_list.append(operation)
+            # self.operation_dict[operation].left_vehicle_list.append(vehicle_name)
+            vehicle.operation_list.append(operation)
+            min_operation_index = min(self.operation_list.index(operation), min_operation_index)
+        vehicle_order_dict[vehicle_name] = min_operation_index
+
+    sorted_list = sorted(vehicle_order_dict.items(), key=lambda item: (-item[1], self.vehicle_dict[item[0]].operation_dict[self.operation_list[item[1]]]))
+    for i, (vehicle_name, min_operation_index) in enumerate(sorted_list):
+        self.vehicle_dict[vehicle_name].order = i
+        print(vehicle_name, min_operation_index, self.vehicle_dict[vehicle_name].operation_dict[self.operation_list[min_operation_index]])
