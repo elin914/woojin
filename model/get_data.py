@@ -19,7 +19,7 @@ def get_data_from_xlsx(self):
     self.test_operation_list = [1, 8, 9, 10, 13, 19, 29, 33, 34, 36, 37, 42, 44, 47]
     self.TC_operation_list = [14, 20, 23, 26, 30, 32]
     self.operation_dict = {"operation" + str(i): Operation(row['세부공정명'], i, i in self.test_operation_list,
-                                                           i in self.TC_operation_list, row['담당공정'])
+                                                           i in self.TC_operation_list, row['담당공정'][:2])
                            for i, row in self.df_process.iterrows()}
     self.same_sequence_constraint = [[1, 2], [38, 39, 40, 41], [42, 43], [46, 47]]
 

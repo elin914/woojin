@@ -32,9 +32,12 @@ class CPmodel:
 
         self.operation0_dict = dict()  # vehicle_name: date
 
-        self.max_load = self.model.integer_var(0, 50)
+        self.max_load = self.model.integer_var()
+        # self.max_load = self.model.integer_var(0, 40)
         self.load_step_function = self.model.step_at(0, 0)
-        self.operation_var_dict_by_vehicle_operation = dict()
+        self.operation_var_dict_by_vehicle_operation_dict = dict()
+        self.step_function_by_operation_dict = dict()
+        self.step_function_by_vechicle_dict = dict()
 
     def get_data(self):
         if self.config['use_API']:
