@@ -1,4 +1,5 @@
 import json
+import numpy as np
 import pandas as pd
 
 
@@ -16,6 +17,8 @@ class Vehicles_result:
 
 def save_results(self):
     if self.solution:
+        print(self.solution.get_value(self.max_load))
+        print(self.solution.get_value(self.min_load))
         for (vehicle_name, operation), var in self.operation_var_dict_by_vehicle_operation_dict.items():
             self.vehicle_dict[vehicle_name].operation_dict[operation] = self.solution.get_var_solution(var).get_start()
         for vehicle_name, vehicle in self.vehicle_dict.items():
@@ -28,8 +31,10 @@ def save_results(self):
                 "data": {
                     "holiday": self.calendar.holiday,
                     "saturday": self.calendar.saturday,
-                    "index_to_day_calendar": {key: value.strftime('%Y-%m-%d') for key, value in self.calendar.index_to_day_calendar_dict.items()},
-                    "day_to_index_calendar": {key.strftime('%Y-%m-%d'): value for key, value in self.calendar.day_to_index_calendar_dict.items()}
+                    "index_to_day_calendar": {key: value.strftime('%Y-%m-%d') for key, value in
+                                              self.calendar.index_to_day_calendar_dict.items()},
+                    "day_to_index_calendar": {key.strftime('%Y-%m-%d'): value for key, value in
+                                              self.calendar.day_to_index_calendar_dict.items()}
                 }
             },
             "operations": {
@@ -55,3 +60,47 @@ def save_results(self):
         except TypeError as e:
             # json.dump가 직렬화할 수 없는 객체를 만났을 때 발생 (예: __dict__로 처리 안 된 사용자 객체)
             print(f"JSON 직렬화 중 오류가 발생했습니다: {e}")
+
+        results = []
+        days = {'공정명': None, '담당공정': None, '검사공정여부': None, 'TC대상공정여부': None}
+        for i in list(self.calendar.index_to_day_calendar_dict.keys()):
+            days[i] = None
+        for holiday in self.calendar.holiday:
+            days[holiday] = 'holiday'
+        for saturday in self.calendar.saturday:
+            days[saturday] = 'saturday'
+        results.append(days)
+        counts = {'공정명': None, '담당공정': None, '검사공정여부': None, 'TC대상공정여부': None}
+        for i in list(self.calendar.index_to_day_calendar_dict.keys()):
+            counts[i] = 0
+        for operation_name, operation in self.operation_dict.items():
+            result = {'공정명': operation.operation_name, '담당공정': operation.department,
+                      '검사공정여부': operation.test_operation, 'TC대상공정여부': operation.type_TC}
+            for i in list(self.calendar.index_to_day_calendar_dict.keys()):
+                result[i] = ' '
+            for (vehicle_name, operation_name2), var in self.operation_var_dict_by_vehicle_operation_dict.items():
+                if operation_name == operation_name2:
+                    index = self.solution.get_var_solution(var).get_start()
+                    if result[index] == ' ':
+                        result[index] = vehicle_name
+                    else:
+                        result[index] += ', ' + vehicle_name
+                    counts[index] += 1
+            results.append(result)
+        results.append(counts)
+        result_df = pd.DataFrame(results,
+                                 columns=['공정명', '담당공정', '검사공정여부', 'TC대상공정여부'] +
+                                         list(self.calendar.index_to_day_calendar_dict.keys()))
+        result_df.to_excel(self.config['folderpath'] + '/result_table.xlsx', index=False)
+
+        print('입력 시 일별 부하:', list(self.load_step_dict.values()))
+        print('입력 시 부하 평균:', np.round(np.mean([value for value in self.load_step_dict.values() if value != 0]), 3))
+        print('입력 시 부하 분산:', np.round(np.var([value for value in self.load_step_dict.values() if value != 0]), 3))
+        print('-------------------------------------------------------')
+        del counts['공정명']
+        del counts['담당공정']
+        del counts['검사공정여부']
+        del counts['TC대상공정여부']
+        print('최적화 결과 일별 부하:', list(counts.values()))
+        print('최적화 결과 부하 평균:', np.round(np.mean([value for value in counts.values() if value != 0]), 3))
+        print('최적화 결과 부하 분산:', np.round(np.var([value for value in counts.values() if value != 0]), 3))

@@ -24,8 +24,10 @@ def get_data_from_xlsx(self):
     self.same_sequence_constraint = [[1, 2], [38, 39, 40, 41], [42, 43], [46, 47]]
 
     self.calendar = Calendar()
-    self.calendar.holiday = [1, 5, 12, 19, 26, 28, 29, 30]
-    self.calendar.saturday = [4, 11, 18, 25]
+    # self.calendar.holiday = [1, 5, 12, 19, 26, 28, 29, 30]
+    self.calendar.holiday = [0, 4, 11, 18, 25, 27, 28, 29]
+    # self.calendar.saturday = [4, 11, 18, 25]
+    self.calendar.saturday = [3, 10, 17, 24]
     self.calendar.index_to_day_calendar_dict = {i: pd.to_datetime('2025-01-01') + pd.Timedelta(days=day - 1)
                                                 for i, day in enumerate(range(self.start_time_index + 1,
                                                                                          self.end_time_index + 1))}
@@ -44,7 +46,7 @@ def get_data_from_xlsx(self):
     for row_idx in range(self.df_vehicle.shape[0]):
         operation_name = self.df_vehicle.index[row_idx]
         for col_idx in range(self.df_vehicle.shape[1]):
-            date = self.df_vehicle.columns[col_idx]
+            date = self.df_vehicle.columns[col_idx] - 1
             vehicle_name = self.df_vehicle.iloc[row_idx, col_idx]
 
             if pd.notna(vehicle_name):
@@ -67,4 +69,10 @@ def get_data_from_xlsx(self):
     sorted_list = sorted(vehicle_order_dict.items(), key=lambda item: (-item[1], self.vehicle_dict[item[0]].operation_dict[self.operation_list[item[1]]]))
     for i, (vehicle_name, min_operation_index) in enumerate(sorted_list):
         self.vehicle_dict[vehicle_name].order = i
-        print(vehicle_name, min_operation_index, self.vehicle_dict[vehicle_name].operation_dict[self.operation_list[min_operation_index]])
+        # print(vehicle_name, min_operation_index, self.vehicle_dict[vehicle_name].operation_dict[self.operation_list[min_operation_index]])
+
+    self.load_step_dict = {index: 0 for index in self.calendar.index_to_day_calendar_dict}
+    for vehicle_name, vehicle in self.vehicle_dict.items():
+        for operation_name, date in vehicle.operation_dict.items():
+            self.load_step_dict[date] += 1
+    print(self.load_step_dict)

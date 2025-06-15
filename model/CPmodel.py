@@ -32,9 +32,13 @@ class CPmodel:
 
         self.operation0_dict = dict()  # vehicle_name: date
 
-        self.max_load = self.model.integer_var()
-        # self.max_load = self.model.integer_var(0, 40)
+        self.load_step_dict = list()
+        # self.max_load = self.model.integer_var()
+        self.max_load = self.model.integer_var(0, 35)
+        # self.min_load = self.model.integer_var()
+        self.min_load = self.model.integer_var(0, 35)
         self.load_step_function = self.model.step_at(0, 0)
+        self.load_step_function2 = self.model.step_at(0, 0) + self.model.pulse((self.start_time_index, self.end_time_index), 50)
         self.operation_var_dict_by_vehicle_operation_dict = dict()
         self.step_function_by_operation_dict = dict()
         self.step_function_by_vechicle_dict = dict()
