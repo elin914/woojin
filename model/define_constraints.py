@@ -52,7 +52,7 @@ def define_constraints(self):
                           operation_name2].department):
                     self.model.add(self.model.end_of(var) <= self.model.start_of(var2))
             if vehicle_name != vehicle_name2 and operation_name == operation_name2 and self.vehicle_dict[
-                vehicle_name].order < self.vehicle_dict[vehicle_name2].order:
+                vehicle_name].order < self.vehicle_dict[vehicle_name2].order - 2:
                 self.model.add(self.model.start_of(var) <= self.model.start_of(var2))
 
     # 공정 별 capacity 제약

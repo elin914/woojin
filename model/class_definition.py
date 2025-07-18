@@ -30,3 +30,6 @@ class Vehicle:
     def add_operation(self, operation, date):
         if operation not in self.operation_dict:
             self.operation_dict[operation] = date
+        # else:
+        #     if date > self.operation_dict[operation]:
+        #         self.operation_dict[operation] = date

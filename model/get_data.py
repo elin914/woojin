@@ -3,14 +3,22 @@ from class_definition import *
 
 
 def get_data_from_xlsx(self):
-    # 공정 리스트
-    self.df_process = pd.read_excel(self.config['data_file_path'], skiprows=[0, 1, 2], usecols='C:D', nrows=64)
-    self.df_vehicle = pd.read_excel(self.config['data_file_path'], skiprows=[0, 1, 2, 3], usecols='F:BG', nrows=62)
+    # # 공정 리스트
+    # self.df_process = pd.read_excel(self.config['data_file_path1'], skiprows=[0, 1, 2], usecols='C:D', nrows=64)
+    # df_vehicle1 = pd.read_excel(self.config['data_file_path1'], skiprows=[0, 1, 2, 3], usecols='F:BG', nrows=62)
+    # df_vehicle2 = pd.read_excel(self.config['data_file_path2'], skiprows=[0, 1, 2, 3], usecols='F:BA', nrows=62)
+    # df_vehicle3 = pd.read_excel(self.config['data_file_path3'], skiprows=[0, 1, 2, 3], usecols='F:BE', nrows=62)
+    self.df_process = pd.read_excel(self.config['data_file_path1'], skiprows=[0, 1, 2, 5, 6, 7], usecols='C:D', nrows=61)
+    df_vehicle1 = pd.read_excel(self.config['data_file_path1'], skiprows=[0, 1, 2, 3, 5, 6, 7], usecols='F:BG', nrows=59)
+    df_vehicle2 = pd.read_excel(self.config['data_file_path2'], skiprows=[0, 1, 2, 3, 5, 6, 7], usecols='F:BA', nrows=59)
+    df_vehicle3 = pd.read_excel(self.config['data_file_path3'], skiprows=[0, 1, 2, 3, 5, 6, 7], usecols='F:BE', nrows=59)
     self.df_process = self.df_process.drop(index=self.df_process.index[0])
     self.df_process = self.df_process.reset_index(drop=True)
     self.df_process = self.df_process.map(lambda x: x.strip() if isinstance(x, str) else x)
     self.df_process = self.df_process.ffill()
-    self.df_vehicle.index = self.df_process['세부공정명'].tolist()
+    df_vehicle1.index = self.df_process['세부공정명'].tolist()
+    df_vehicle2.index = self.df_process['세부공정명'].tolist()
+    df_vehicle3.index = self.df_process['세부공정명'].tolist()
     self.df_process.drop_duplicates(inplace=True)
     self.df_process = self.df_process.reset_index(drop=True)
 
@@ -24,10 +32,10 @@ def get_data_from_xlsx(self):
     self.same_sequence_constraint = [[1, 2], [38, 39, 40, 41], [42, 43], [46, 47]]
 
     self.calendar = Calendar()
-    # self.calendar.holiday = [1, 5, 12, 19, 26, 28, 29, 30]
-    self.calendar.holiday = [0, 4, 11, 18, 25, 27, 28, 29]
-    # self.calendar.saturday = [4, 11, 18, 25]
-    self.calendar.saturday = [3, 10, 17, 24]
+    # self.calendar.holiday = [0, 4, 11, 18, 25, 27, 28, 29]
+    self.calendar.holiday = [0, 4, 11, 18, 25, 27, 28, 29, 32, 39, 46, 53, 59, 60, 61, 67, 74, 81, 88]
+    # self.calendar.saturday = [3, 10, 17, 24]
+    self.calendar.saturday = [3, 10, 17, 24, 31, 38, 45, 52, 66, 73, 80, 87]
     self.calendar.index_to_day_calendar_dict = {i: pd.to_datetime('2025-01-01') + pd.Timedelta(days=day - 1)
                                                 for i, day in enumerate(range(self.start_time_index + 1,
                                                                                          self.end_time_index + 1))}
@@ -37,11 +45,29 @@ def get_data_from_xlsx(self):
     self.calendar.day_to_index_calendar_dict = \
         {value: key for key, value in self.calendar.index_to_day_calendar_dict.items()}
 
-    columns = self.df_vehicle.columns.tolist()
-    for i in range(1, len(columns)):  # 첫 번째 열은 처리할 필요 없음
+    columns = df_vehicle1.columns.tolist()
+    for i in range(len(columns)):
         if isinstance(columns[i], str) and "Unnamed" in columns[i]:
             columns[i] = columns[i - 1]  # 바로 왼쪽 열 이름으로 대체
-    self.df_vehicle.columns = columns
+    df_vehicle1.columns = columns
+
+    columns = df_vehicle2.columns.tolist()
+    for i in range(len(columns)):
+        if isinstance(columns[i], int):
+            columns[i] = columns[i] + 31
+        elif isinstance(columns[i], str) and "Unnamed" in columns[i]:
+            columns[i] = columns[i - 1]  # 바로 왼쪽 열 이름으로 대체
+    df_vehicle2.columns = columns
+
+    columns = df_vehicle3.columns.tolist()
+    for i in range(len(columns)):
+        if isinstance(columns[i], int):
+            columns[i] = columns[i] + 59
+        elif isinstance(columns[i], str) and "Unnamed" in columns[i]:
+            columns[i] = columns[i - 1]  # 바로 왼쪽 열 이름으로 대체
+    df_vehicle3.columns = columns
+
+    self.df_vehicle = pd.concat([df_vehicle1, df_vehicle2, df_vehicle3], axis=1)
 
     for row_idx in range(self.df_vehicle.shape[0]):
         operation_name = self.df_vehicle.index[row_idx]

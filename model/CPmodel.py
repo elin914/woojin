@@ -17,7 +17,8 @@ class CPmodel:
         self.search_start_time = None
         self.solution = None
         self.start_time_index = 0
-        self.end_time_index = 31
+        # self.end_time_index = 31
+        self.end_time_index = 90
 
         self.df_process = pd.DataFrame()
         self.df_vehicle = pd.DataFrame()
@@ -34,9 +35,9 @@ class CPmodel:
 
         self.load_step_dict = list()
         # self.max_load = self.model.integer_var()
-        self.max_load = self.model.integer_var(0, 35)
+        self.max_load = self.model.integer_var(0, self.config['load_max'])
         # self.min_load = self.model.integer_var()
-        self.min_load = self.model.integer_var(0, 35)
+        self.min_load = self.model.integer_var(0, self.config['load_max'])
         self.load_step_function = self.model.step_at(0, 0)
         self.load_step_function2 = self.model.step_at(0, 0) + self.model.pulse((self.start_time_index, self.end_time_index), 50)
         self.operation_var_dict_by_vehicle_operation_dict = dict()

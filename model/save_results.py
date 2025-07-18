@@ -93,14 +93,27 @@ def save_results(self):
                                          list(self.calendar.index_to_day_calendar_dict.keys()))
         result_df.to_excel(self.config['folderpath'] + '/result_table.xlsx', index=False)
 
+        # ## holiday를 제거하고 계산하도록 수정
         print('입력 시 일별 부하:', list(self.load_step_dict.values()))
-        print('입력 시 부하 평균:', np.round(np.mean([value for value in self.load_step_dict.values() if value != 0]), 3))
-        print('입력 시 부하 분산:', np.round(np.var([value for value in self.load_step_dict.values() if value != 0]), 3))
+        print('입력 시 부하 평균:', np.round(np.mean([value for key, value in self.load_step_dict.items() if key not in self.calendar.holiday]), 3))
+        print('입력 시 부하 분산:', np.round(np.var([value for key, value in self.load_step_dict.items() if key not in self.calendar.holiday]), 3))
         print('-------------------------------------------------------')
         del counts['공정명']
         del counts['담당공정']
         del counts['검사공정여부']
         del counts['TC대상공정여부']
         print('최적화 결과 일별 부하:', list(counts.values()))
-        print('최적화 결과 부하 평균:', np.round(np.mean([value for value in counts.values() if value != 0]), 3))
-        print('최적화 결과 부하 분산:', np.round(np.var([value for value in counts.values() if value != 0]), 3))
+        print('최적화 결과 부하 평균:', np.round(np.mean([value for key, value in counts.items() if key not in self.calendar.holiday]), 3))
+        print('최적화 결과 부하 분산:', np.round(np.var([value for key, value in counts.items() if key not in self.calendar.holiday]), 3))
+
+        # print('입력 시 일별 부하:', list(self.load_step_dict.values()))
+        # print('입력 시 부하 평균:', np.round(np.mean([value for value in self.load_step_dict.values()]), 3))
+        # print('입력 시 부하 분산:', np.round(np.var([value for value in self.load_step_dict.values()]), 3))
+        # print('-------------------------------------------------------')
+        # del counts['공정명']
+        # del counts['담당공정']
+        # del counts['검사공정여부']
+        # del counts['TC대상공정여부']
+        # print('최적화 결과 일별 부하:', list(counts.values()))
+        # print('최적화 결과 부하 평균:', np.round(np.mean([value for value in counts.values()]), 3))
+        # print('최적화 결과 부하 분산:', np.round(np.var([value for value in counts.values()]), 3))
