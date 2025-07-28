@@ -32,7 +32,8 @@ def define_constraints(self):
         for (vehicle_name2, operation_name2), var2 in self.operation_var_dict_by_vehicle_operation_dict.items():
             same_sequence_condition2 = True
             for same_sequence in self.same_sequence_constraint:
-                if self.operation_list.index(operation_name2) in same_sequence[1:]:
+                # if self.operation_list.index(operation_name2) in same_sequence[1:]:
+                if self.operation_list.index(operation_name) == same_sequence[0] and self.operation_list.index(operation_name2) in same_sequence[1:]:
                     same_sequence_condition2 = False
                     break
             if same_sequence_condition2 is False:

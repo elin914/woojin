@@ -24,12 +24,15 @@ def get_data_from_xlsx(self):
 
     self.process_list = list(self.df_process['세부공정명'])
     self.operation_list = ["operation" + str(i) for i in range(len(self.process_list))]
-    self.test_operation_list = [1, 8, 9, 10, 13, 19, 29, 33, 34, 36, 37, 42, 44, 47]
-    self.TC_operation_list = [14, 20, 23, 26, 30, 32]
+    # self.test_operation_list = [1, 8, 9, 10, 13, 19, 29, 33, 34, 36, 37, 42, 44, 47]
+    self.test_operation_list = [0, 5, 6, 7, 10, 16, 26, 30, 31, 33, 34, 39, 41, 44]  # 제약 만족을 위해 수정
+    # self.TC_operation_list = [14, 20, 23, 26, 30, 32]
+    self.TC_operation_list = [11, 17, 20, 23, 27, 29]
     self.operation_dict = {"operation" + str(i): Operation(row['세부공정명'], i, i in self.test_operation_list,
                                                            i in self.TC_operation_list, row['담당공정'][:2])
                            for i, row in self.df_process.iterrows()}
-    self.same_sequence_constraint = [[1, 2], [38, 39, 40, 41], [42, 43], [46, 47]]
+    # self.same_sequence_constraint = [[1, 2], [38, 39, 40, 41], [42, 43], [46, 47]]
+    self.same_sequence_constraint = [[35, 36, 37, 38], [39, 40], [43, 44]]
 
     self.calendar = Calendar()
     # self.calendar.holiday = [0, 4, 11, 18, 25, 27, 28, 29]

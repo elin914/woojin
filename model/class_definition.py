@@ -32,4 +32,4 @@ class Vehicle:
             self.operation_dict[operation] = date
         # else:
         #     if date > self.operation_dict[operation]:
-        #         self.operation_dict[operation] = date
+        #         self.operation_dict[op-eration] = date

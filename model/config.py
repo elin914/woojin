@@ -6,7 +6,7 @@ import time
 def create_config():
     config = dict()
 
-    config['run_time'] = 300
+    config['run_time'] = 1800
     config['load_max'] = 50
 
     config['use_API'] = False
