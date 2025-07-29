@@ -1,6 +1,7 @@
 class Operation:
-    def __init__(self, operation_name, order, test_operation, type_TC, department):
+    def __init__(self, operation_name, id, order, test_operation, type_TC, department):
         self.operation_name = operation_name
+        self.id = id
         self.order = order
         self.test_operation = test_operation  # True or False, 검사 공정 여부
         self.type_TC = type_TC  # True or False
@@ -20,9 +21,10 @@ class Calendar:
 
 
 class Vehicle:
-    def __init__(self, vehicle_name, type_TC):
+    def __init__(self, vehicle_name, id, order, type_TC):
         self.vehicle_name = vehicle_name
-        self.order = None
+        self.id = id
+        self.order = order
         self.type_TC = type_TC
         self.operation_dict = dict()
         self.operation_list = list()

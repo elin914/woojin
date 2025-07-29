@@ -6,11 +6,15 @@ import time
 def create_config():
     config = dict()
 
-    config['run_time'] = 1800
-    config['load_max'] = 50
+    config['run_time'] = 300
+    config['load_max'] = 100
 
-    config['use_API'] = False
-    config['API_ID'] = None
+    config['use_API'] = True
+    config['API_ID'] = 'csdtpcp'
+    config['API_PASSWORD'] = 'dtpcp!@'
+    config['start_time'] = '2021-08-01'
+    config['end_time'] = '2021-10-31'
+    config['project_id'] = 'e672bd1e-5ed0-4baa-9cbd-50db20ea24db'
     config['data_file_path1'] = '../data/생관3-612-24-031_2025년 1월 일일생산계획 및 업체별 차종현황_Rev.00_24.12.31(확정).xlsx'
     config['data_file_path2'] = '../data/생관3-612-25-001_2025년 2월 일일생산계획 및 업체별 차종현황_Rev.00_25.01.24(확정).xlsx'
     config['data_file_path3'] = '../data/생관3-612-25-003_2025년 3월 일일생산계획 및 업체별 차종현황_Rev.00_25.02.28(확정).xlsx'

@@ -5,7 +5,7 @@ def define_constraints(self):
                                           self.vehicle_dict.keys()}
     for (vehicle_name, operation_name), var in self.operation_var_dict_by_vehicle_operation_dict.items():
         # 흡음재 취부 일정 고정
-        if self.operation_dict[operation_name].order == 0:
+        if self.operation_dict[operation_name].order == 2:
             self.model.add(self.model.start_of(var) == self.operation0_dict[vehicle_name])
         # 토요일 검사 불가능
         if self.operation_dict[operation_name].test_operation:

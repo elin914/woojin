@@ -16,6 +16,8 @@ class CPmodel:
         self.model = CpoModel()
         self.search_start_time = None
         self.solution = None
+        self.start_time = pd.to_datetime(self.config['start_time'])
+        self.end_time = pd.to_datetime(self.config['end_time'])
         self.start_time_index = 0
         # self.end_time_index = 31
         self.end_time_index = 90
@@ -27,6 +29,7 @@ class CPmodel:
         self.test_operation_list = list()
         self.TC_operation_list = list()
         self.operation_dict = dict()
+        self.operation_id_to_key_dict = dict()
         self.same_sequence_constraint = list()
         self.calendar = None
         self.vehicle_dict = dict()
@@ -39,16 +42,17 @@ class CPmodel:
         # self.min_load = self.model.integer_var()
         self.min_load = self.model.integer_var(0, self.config['load_max'])
         self.load_step_function = self.model.step_at(0, 0)
-        self.load_step_function2 = self.model.step_at(0, 0) + self.model.pulse((self.start_time_index, self.end_time_index), 50)
+        self.load_step_function2 = self.model.step_at(0, 0) + self.model.pulse((self.start_time_index, self.end_time_index), self.config['load_max'])
         self.operation_var_dict_by_vehicle_operation_dict = dict()
         self.step_function_by_operation_dict = dict()
-        self.step_function_by_vechicle_dict = dict()
+        self.step_function_by_vehicle_dict = dict()
 
     def get_data(self):
         if self.config['use_API']:
-            pass
+            get_data_from_api(self)
         else:
             get_data_from_xlsx(self)
+        print("Load Data Completed")
 
     def run_model(self):
         define_variables(self)
