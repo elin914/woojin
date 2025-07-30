@@ -42,18 +42,20 @@ def define_constraints(self):
             if vehicle_name == vehicle_name2 and operation_name != operation_name2:
                 # 공정이 끝나야 검사 수행 가능
                 if (self.operation_dict[operation_name].order < self.operation_dict[operation_name2].order
-                        and self.operation_dict[operation_name2].test_operation):
-                    self.model.add(self.model.end_of(var) <= self.model.start_of(var2))
-                elif (self.operation_dict[operation_name].order < self.operation_dict[operation_name2].order
-                      and self.operation_dict[operation_name].test_operation):
-                    self.model.add(self.model.end_of(var) <= self.model.start_of(var2))
+                        and (self.operation_dict[operation_name].test_operation or self.operation_dict[operation_name2].test_operation)):
+                    self.model.add(self.model.end_of(var) <= self.model.end_of(var2))
+                    # self.model.add(self.model.end_of(var) <= self.model.start_of(var2))
+                # elif (self.operation_dict[operation_name].order < self.operation_dict[operation_name2].order
+                #       and self.operation_dict[operation_name].test_operation):
+                #     # self.model.add(self.model.end_of(var) <= self.model.start_of(var2))
+                #     self.model.add(self.model.end_of(var) <= self.model.end_of(var2))
                 # 그룹 내 선후행 제약
-                elif (self.operation_dict[operation_name].order < self.operation_dict[operation_name2].order
-                      and self.operation_dict[operation_name].department == self.operation_dict[
-                          operation_name2].department):
-                    self.model.add(self.model.end_of(var) <= self.model.start_of(var2))
-            if vehicle_name != vehicle_name2 and operation_name == operation_name2 and self.vehicle_dict[
-                vehicle_name].order < self.vehicle_dict[vehicle_name2].order - 2:
+                if (self.operation_dict[operation_name].order < self.operation_dict[operation_name2].order
+                        and self.operation_dict[operation_name].department == self.operation_dict[operation_name2].department):
+                    # self.model.add(self.model.end_of(var) <= self.model.start_of(var2))
+                    self.model.add(self.model.end_of(var) <= self.model.end_of(var2))
+            if (vehicle_name != vehicle_name2 and operation_name == operation_name2 and
+                    self.vehicle_dict[vehicle_name].order < self.vehicle_dict[vehicle_name2].order - 10):
                 self.model.add(self.model.start_of(var) <= self.model.start_of(var2))
 
     # 공정 별 capacity 제약

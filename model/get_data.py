@@ -49,11 +49,17 @@ def get_data_from_api(self):
         {value: key for key, value in self.calendar.index_to_day_calendar_dict.items()}
     self.calendar.saturday = [index for index, date in enumerate(date_range) if date.weekday() == 5]
     self.calendar.holiday = [index for index, date in enumerate(date_range) if date.weekday() == 6]
+    # df_holiday = pd.DataFrame(load_api(self, 'Holiday')['data'])
+    # df_holiday['offDate'] = pd.to_datetime(df_holiday['offDate'])
+    # df_holiday = df_holiday[(self.start_time <= df_holiday['offDate']) & (df_holiday['offDate'] <= self.end_time)]
+    # for holiday in list(df_holiday['offDate']):
+    #     self.calendar.holiday.append(self.calendar.day_to_index_calendar_dict[holiday])
+    # self.calendar.holiday = sorted(self.calendar.holiday)
     self.end_time_index = max(self.calendar.index_to_day_calendar_dict.keys())
 
     self.df_vehicle = pd.DataFrame(load_api(self, 'Cars/' + self.config['project_id'] + '?allYn=Y')['data'])
     for i, row in self.df_vehicle.iterrows():
-        data_temp = load_api(self, 'WorkPlan/' + self.config['project_id'] + '/' + row['carId'])
+        data_temp = load_api(self, 'WorkPlan/' + self.config['project_id'] + '?carId=' + row['carId'])
         if data_temp['code'] == 10:
             continue
         df_temp = pd.DataFrame(data_temp['data'])
@@ -66,7 +72,7 @@ def get_data_from_api(self):
         for _, row2 in df_temp.iterrows():
             self.vehicle_dict[row['carCd']].add_operation(self.operation_id_to_key_dict[row2['pcId']],
                                                           self.calendar.day_to_index_calendar_dict[pd.to_datetime(row2['planDate'])])
-            if self.operation_id_to_key_dict[row2['pcId']] == 'operation2':
+            if self.operation_id_to_key_dict[row2['pcId']] == 'operation2' and row['carCd'] not in self.operation0_dict:
                 self.operation0_dict[row['carCd']] = self.calendar.day_to_index_calendar_dict[pd.to_datetime(row2['planDate'])]
     for vehicle_name, vehicle in self.vehicle_dict.items():
         for operation in vehicle.operation_dict:
@@ -77,6 +83,10 @@ def get_data_from_api(self):
         for operation_name, date in vehicle.operation_dict.items():
             self.load_step_dict[date] += 1
     print(self.load_step_dict)
+    for date in [key for key, value in self.load_step_dict.items() if value == 0]:
+        if date not in self.calendar.holiday:
+            self.calendar.holiday.append(date)
+    self.calendar.holiday = sorted(self.calendar.holiday)
 
 
 def get_data_from_xlsx(self):

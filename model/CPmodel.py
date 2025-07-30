@@ -20,7 +20,7 @@ class CPmodel:
         self.end_time = pd.to_datetime(self.config['end_time'])
         self.start_time_index = 0
         # self.end_time_index = 31
-        self.end_time_index = 90
+        self.end_time_index = None
 
         self.df_process = pd.DataFrame()
         self.df_vehicle = pd.DataFrame()
@@ -41,8 +41,10 @@ class CPmodel:
         self.max_load = self.model.integer_var(0, self.config['load_max'])
         # self.min_load = self.model.integer_var()
         self.min_load = self.model.integer_var(0, self.config['load_max'])
-        self.load_step_function = self.model.step_at(0, 0)
-        self.load_step_function2 = self.model.step_at(0, 0) + self.model.pulse((self.start_time_index, self.end_time_index), self.config['load_max'])
+        # self.load_step_function = self.model.step_at(0, 0)
+        # self.load_step_function2 = self.model.step_at(0, 0) + self.model.pulse((self.start_time_index, self.end_time_index + 1), self.config['load_max'])
+        self.load_step_function = None
+        self.load_step_function2 = None
         self.operation_var_dict_by_vehicle_operation_dict = dict()
         self.step_function_by_operation_dict = dict()
         self.step_function_by_vehicle_dict = dict()
@@ -62,6 +64,8 @@ class CPmodel:
         define_object_functions(self)
         print("Define Object Functions Completed")
         self.search_start_time = time.time()
-        # self.solution = self.model.start_search(TimeLimit=self.config['run_time'])
-        self.solution = self.model.solve(TimeLimit=self.config['run_time'])
+        if self.config['search_method'] == 'multiple_solution':
+            self.solution = self.model.start_search(TimeLimit=self.config['run_time'])
+        else:
+            self.solution = self.model.solve(TimeLimit=self.config['run_time'])
         save_results(self)
