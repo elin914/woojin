@@ -34,8 +34,8 @@ def get_data_from_api(self):
     self.df_process = self.df_process[self.df_process['pcId'] != 'cfae0823-3d36-4f38-a902-619beca12b22']
     self.df_process = pd.concat([self.df_process, row_temp]).reset_index(drop=True)
     self.process_list = list(self.df_process['pcNm'])
-    self.operation_dict = {"operation" + str(i): Operation(row['pcNm'], row['pcId'], i,
-                                                           row['examCheck'], row['tcCheck'], row['pcTp'])
+    self.operation_dict = {"operation" + str(i): Operation(row['pcNm'], row['pcId'], i, row['examCheck'],
+                                                           row['tcCheck'], row['pcTp'] if not row['examCheck'] else 0)
                            for i, row in self.df_process.iterrows()}
     self.operation_list = list(self.operation_dict)
     self.operation_id_to_key_dict = {value.id: key for key, value in self.operation_dict.items()}
