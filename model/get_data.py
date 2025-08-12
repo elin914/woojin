@@ -57,7 +57,14 @@ def get_data_from_api(self):
     # self.calendar.holiday = sorted(self.calendar.holiday)
     self.end_time_index = max(self.calendar.index_to_day_calendar_dict.keys())
 
-    self.df_vehicle = pd.DataFrame(load_api(self, 'Cars/' + self.config['project_id'] + '?allYn=Y')['data'])
+    df_vehicle = pd.DataFrame(load_api(self, 'Cars/' + self.config['project_id'] + '?allYn=Y')['data'])
+    df_har = pd.DataFrame(load_api(self, 'WorkPlan/harness/' + self.config['project_id'])['data'])
+    df_har['planDate'] = pd.to_datetime(df_har['planDate'])
+    df_har = df_har.loc[df_har.groupby('carId')['planDate'].idxmin()]
+    df_har['harnessSeq'] = df_har['planDate'].rank(method='dense').astype(int)
+    self.df_vehicle = pd.merge(df_vehicle, df_har, on='carId', how='left').fillna(0)
+    self.df_vehicle['harnessSeq'] = self.df_vehicle['harnessSeq'].astype(int)
+    # self.df_vehicle = self.df_vehicle[self.df_vehicle['harnessSeq'] != 0]
     for i, row in self.df_vehicle.iterrows():
         data_temp = load_api(self, 'WorkPlan/' + self.config['project_id'] + '?carId=' + row['carId'])
         if data_temp['code'] == 10:
@@ -68,7 +75,7 @@ def get_data_from_api(self):
         df_temp = df_temp[df_temp['pcId'].isin(self.df_process['pcId'])]
         if df_temp.shape[0] == 0:
             continue
-        self.vehicle_dict[row['carCd']] = Vehicle(row['carCd'], row['carId'], int(row['carSeq']), 'TC' in row['carType'])
+        self.vehicle_dict[row['carCd']] = Vehicle(row['carCd'], row['carId'], int(row['harnessSeq']), 'TC' in row['carType'])
         for _, row2 in df_temp.iterrows():
             self.vehicle_dict[row['carCd']].add_operation(self.operation_id_to_key_dict[row2['pcId']],
                                                           self.calendar.day_to_index_calendar_dict[pd.to_datetime(row2['planDate'])])
@@ -77,6 +84,8 @@ def get_data_from_api(self):
     for vehicle_name, vehicle in self.vehicle_dict.items():
         for operation in vehicle.operation_dict:
             vehicle.operation_list.append(operation)
+        vehicle.operation_dict = {key: vehicle.operation_dict[key] for key in sorted([key for key in vehicle.operation_dict.keys()], key=lambda x: int(x.replace('operation', '')))}
+        vehicle.min_operation_name = min(vehicle.operation_dict, key=vehicle.operation_dict.get)
 
     self.load_step_dict = {index: 0 for index in self.calendar.index_to_day_calendar_dict}
     for vehicle_name, vehicle in self.vehicle_dict.items():

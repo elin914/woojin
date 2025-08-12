@@ -6,10 +6,10 @@ import time
 def create_config():
     config = dict()
 
-    config['run_time'] = 600
+    config['run_time'] = 60
     # single_solution, multiple_solution
     config['search_method'] = 'single_solution'
-    config['load_max'] = 35
+    config['load_max'] = 33
 
     config['use_API'] = True
     config['API_ID'] = 'csdtpcp'

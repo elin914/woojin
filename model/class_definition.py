@@ -28,10 +28,11 @@ class Vehicle:
         self.type_TC = type_TC
         self.operation_dict = dict()
         self.operation_list = list()
+        self.min_operation_name = None
 
     def add_operation(self, operation, date):
         if operation not in self.operation_dict:
             self.operation_dict[operation] = date
-        # else:
-        #     if date > self.operation_dict[operation]:
-        #         self.operation_dict[op-eration] = date
+        else:
+            if date < self.operation_dict[operation]:
+                self.operation_dict[operation] = date

@@ -3,7 +3,19 @@ def define_constraints(self):
     self.step_function_by_operation_dict = {operation: self.model.step_at(0, 0) for operation in self.operation_list}
     self.step_function_by_vehicle_dict = {vehicle_name: self.model.step_at(0, 0) for vehicle_name in
                                           self.vehicle_dict.keys()}
+    temp_dict = {}
     for (vehicle_name, operation_name), var in self.operation_var_dict_by_vehicle_operation_dict.items():
+        # 이월 공정에 대해 operation order가 가장 작은 공정의 일정 고정
+        if operation_name == self.vehicle_dict[vehicle_name].min_operation_name:
+            if operation_name in ['operation0', 'operation11']:
+                pass
+            else:
+                if operation_name not in temp_dict:
+                    temp_dict[operation_name] = [(self.vehicle_dict[vehicle_name].order, self.vehicle_dict[vehicle_name].operation_dict[operation_name])]
+                else:
+                    temp_dict[operation_name].append((self.vehicle_dict[vehicle_name].order, self.vehicle_dict[vehicle_name].operation_dict[operation_name]))
+                # print(self.vehicle_dict[vehicle_name].order, self.vehicle_dict[vehicle_name].min_operation_name, self.vehicle_dict[vehicle_name].operation_dict[operation_name])
+                # self.model.add(self.model.start_of(var) == self.vehicle_dict[vehicle_name].operation_dict[operation_name])
         # 흡음재 취부 일정 고정
         if self.operation_dict[operation_name].order == 2:
             self.model.add(self.model.start_of(var) == self.operation0_dict[vehicle_name])
@@ -55,7 +67,8 @@ def define_constraints(self):
                     # self.model.add(self.model.end_of(var) <= self.model.start_of(var2))
                     self.model.add(self.model.end_of(var) <= self.model.end_of(var2))
             if (vehicle_name != vehicle_name2 and operation_name == operation_name2 and
-                    self.vehicle_dict[vehicle_name].order < self.vehicle_dict[vehicle_name2].order - 10):
+                    self.vehicle_dict[vehicle_name].order > 0 and self.vehicle_dict[vehicle_name2].order > 0 and
+                    self.vehicle_dict[vehicle_name].order < self.vehicle_dict[vehicle_name2].order - 2):
                 self.model.add(self.model.start_of(var) <= self.model.start_of(var2))
 
     # 공정 별 capacity 제약
