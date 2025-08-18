@@ -1,5 +1,7 @@
 def define_constraints(self):
     # 검사 기간 사이의 그룹 내 선후행 제약
+    
+    ## operation에 따른 load를 저장하기 위한 step function 초기화
     self.step_function_by_operation_dict = {operation: self.model.step_at(0, 0) for operation in self.operation_list}
     self.step_function_by_vehicle_dict = {vehicle_name: self.model.step_at(0, 0) for vehicle_name in
                                           self.vehicle_dict.keys()}
