@@ -1,0 +1,9 @@
+def define_object_functions(self):
+    # max_load: 모든 interval을 모아 동시에 실행될 수 있는 작업 수의 상한
+    all_intervals = list(self.operation_var_dict_by_vehicle_operation_dict.values())
+    self.max_load = self.model.NewIntVar(0, len(all_intervals), "max_load")
+
+    if all_intervals:
+        self.model.AddCumulative(all_intervals, [1] * len(all_intervals), self.max_load)
+
+    self.model.Minimize(self.max_load)

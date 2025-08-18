@@ -6,10 +6,10 @@ from ortools.sat.python import cp_model
 import time
 import pandas as pd
 from get_data import *
-from define_variables import *
-from define_constraints import *
-from define_objective_functions import *
-from save_results import *
+from define_variables_orTools import *
+from define_constraints_orTools import *
+from define_objective_functions_orTools import *
+from save_results_orTools import *
 
 class CPmodel:
     def __init__(self, config):
@@ -38,6 +38,11 @@ class CPmodel:
         self.operation0_dict = dict()  # vehicle_name: date
         self.load_step_dict = list()
         
+        # CP-SAT 보관용 dict ; define_variables.py 참조
+        self.starts = {}
+        self.ends = {}
+        self.intervals = {}
+        
         self.max_load = self.model.NewIntVar(0, self.config['load_max'], f'max_load')
         # self.max_load = self.model.integer_var(0, self.config['load_max'])
         self.min_load = self.model.NewIntVar(0, self.config['load_max'], f'max_load')
@@ -58,25 +63,24 @@ class CPmodel:
             get_data_from_xlsx(self)
         print("Load Data Completed")
 
-    def run_model(self):
-        
-        # added
-        solver = cp_model.CpSolver()
-        solver.parameters.log_search_progress = True # Search progress log: enabled
-        solver.parameters.max_time_in_seconds = self.config['run_time'] # Exploration time cap
-        
-        status = solver.Solve(self.model)
-        
-        define_variables(self)
-        print("Define Variables Completed")
-        define_constraints(self)
-        print("Define Constraints Completed")
-        define_object_functions(self)
-        print("Define Object Functions Completed")
-        self.search_start_time = time.time()
-        
-        if status == cp_model.OPTIMAL or status == cp_model.FEASIBLE:
-            print(f"Solution found")
-        else :
-            print("Cannot find a feasible solution")
-        save_results(self)
+def run_model(self):
+    define_variables(self)
+    define_constraints(self)
+    define_object_functions(self)
+
+    solver = cp_model.CpSolver()
+    solver.parameters.log_search_progress = True
+    solver.parameters.max_time_in_seconds = self.config['run_time']
+
+    status = solver.Solve(self.model)
+
+    # CP-SAT에 맞도록 객체에 저장
+    self.solver = solver
+    self.status = status
+
+    if status in (cp_model.OPTIMAL, cp_model.FEASIBLE):
+        print("Solution found")
+    else:
+        print("Cannot find a feasible solution")
+
+    save_results(self)

@@ -1,13 +1,23 @@
+"""
+    orTools용 실행부
+"""
+
 from config import *
-from CPmodel import *
 import time
+import numpy as np
+from model.CPmodel_orTools import CPmodel
 
-if __name__ == '__main__':
+
+def main():
     start_time = time.time()
-
+    
     config = create_config()
     model = CPmodel(config)
     model.get_data()
     model.run_model()
 
-    print("run time: ", np.round(time.time() - start_time, 5))
+    print("run time:", np.round(time.time() - start_time, 5))
+
+
+if __name__ == '__main__':
+    main()
