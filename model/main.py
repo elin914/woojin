@@ -3,9 +3,9 @@
 """
 
 from config import *
-import time
+import time 
 import numpy as np
-from model.CPmodel_orTools import CPmodel
+from CPmodel_orTools import CPmodel
 
 
 def main():

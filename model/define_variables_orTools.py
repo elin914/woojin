@@ -1,7 +1,7 @@
 def define_variables(self):
     for vehicle_name, vehicle in self.vehicle_dict.items():
         for operation_name in vehicle.operation_list:
-            duration = 1 # 추후 수정 가능
+            duration = 1
 
             #intVariable 정의
             start_var = self.model.NewIntVar(self.start_time_index, self.end_time_index, f"start_var[{vehicle_name},{operation_name}]")

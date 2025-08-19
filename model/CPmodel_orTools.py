@@ -2,8 +2,7 @@ import numpy as np
 
 np.bool = np.bool_
 from ortools.sat.python import cp_model
-# from docplex.cp.model import *
-import time
+# import time
 import pandas as pd
 from get_data import *
 from define_variables_orTools import *
@@ -38,18 +37,17 @@ class CPmodel:
         self.operation0_dict = dict()  # vehicle_name: date
         self.load_step_dict = list()
         
+        
+        self.capacity = int(self.config['load_max'])
+        
         # CP-SAT 보관용 dict ; define_variables.py 참조
         self.starts = {}
         self.ends = {}
         self.intervals = {}
         
         self.max_load = self.model.NewIntVar(0, self.config['load_max'], f'max_load')
-        # self.max_load = self.model.integer_var(0, self.config['load_max'])
-        self.min_load = self.model.NewIntVar(0, self.config['load_max'], f'max_load')
-        # self.min_load = self.model.integer_var(0, self.config['load_max'])
-        
-        # self.load_step_function = self.model.step_at(0, 0)
-        # self.load_step_function2 = self.model.step_at(0, 0) + self.model.pulse((self.start_time_index, self.end_time_index + 1), self.config['load_max'])
+        self.min_load = self.model.NewIntVar(0, self.config['load_max'], f'min_load')
+
         self.load_step_function = None
         self.load_step_function2 = None
         self.operation_var_dict_by_vehicle_operation_dict = dict()
@@ -63,24 +61,24 @@ class CPmodel:
             get_data_from_xlsx(self)
         print("Load Data Completed")
 
-def run_model(self):
-    define_variables(self)
-    define_constraints(self)
-    define_object_functions(self)
+    def run_model(self):
+        define_variables(self)
+        define_constraints(self)
+        define_object_functions(self)
 
-    solver = cp_model.CpSolver()
-    solver.parameters.log_search_progress = True
-    solver.parameters.max_time_in_seconds = self.config['run_time']
+        solver = cp_model.CpSolver()
+        solver.parameters.log_search_progress = True
+        solver.parameters.max_time_in_seconds = self.config['run_time']
 
-    status = solver.Solve(self.model)
+        status = solver.Solve(self.model)
 
-    # CP-SAT에 맞도록 객체에 저장
-    self.solver = solver
-    self.status = status
+        # CP-SAT에 맞도록 객체에 저장
+        self.solver = solver
+        self.status = status
 
-    if status in (cp_model.OPTIMAL, cp_model.FEASIBLE):
-        print("Solution found")
-    else:
-        print("Cannot find a feasible solution")
+        if status in (cp_model.OPTIMAL, cp_model.FEASIBLE):
+            print("Solution found")
+        else:
+            print("Cannot find a feasible solution")
 
-    save_results(self)
+        save_results(self)

@@ -8,3 +8,4 @@ def define_object_functions(self):
     self.model.add(self.load_step_function2 <= self.min_load)
     self.model.add(self.load_step_function <= self.max_load)
     self.model.add(self.model.minimize(self.max_load + self.min_load))
+ 
