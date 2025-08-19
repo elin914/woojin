@@ -10,11 +10,13 @@ from define_constraints_orTools import *
 from define_objective_functions_orTools import *
 from save_results_orTools import *
 
+
 class CPmodel:
     def __init__(self, config):
         self.config = config
         self.model = cp_model.CpModel()
-        # self.model = CpoModel()
+        self.solver = None
+        self.status = None
         self.search_start_time = None
         self.solution = None
         self.start_time = pd.to_datetime(self.config['start_time'])
@@ -37,10 +39,8 @@ class CPmodel:
         self.operation0_dict = dict()  # vehicle_name: date
         self.load_step_dict = list()
         
-        
         self.capacity = int(self.config['load_max'])
         
-        # CP-SAT 보관용 dict ; define_variables.py 참조
         self.starts = {}
         self.ends = {}
         self.intervals = {}
@@ -72,7 +72,6 @@ class CPmodel:
 
         status = solver.Solve(self.model)
 
-        # CP-SAT에 맞도록 객체에 저장
         self.solver = solver
         self.status = status
 

@@ -10,6 +10,8 @@ def create_config():
     # single_solution, multiple_solution
     config['search_method'] = 'single_solution'
     config['load_max'] = 33
+    # ortools, ilog
+    config['model'] = 'ortools'
 
     config['use_API'] = True
     config['API_ID'] = 'csdtpcp'
