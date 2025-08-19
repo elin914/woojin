@@ -1,11 +1,7 @@
-"""
-    orTools용 실행부
-"""
-
 from config import *
 import time 
 import numpy as np
-from CPmodel_orTools import CPmodel
+
 
 def main():
     start_time = time.time()
@@ -13,8 +9,11 @@ def main():
     config = create_config()
     if config['model'] == 'ortools':
         from CPmodel_orTools import CPmodel
-    # elif config['model'] == 'ilog':
-    #     from CPmodel import
+    elif config['model'] == 'ilog':
+        from CPmodel import CPmodel
+    else:
+        print('Model type not supported')
+        return False
     model = CPmodel(config)
     model.get_data()
     model.run_model()

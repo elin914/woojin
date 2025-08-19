@@ -2,6 +2,20 @@ import json
 import numpy as np
 import pandas as pd
 from ortools.sat.python import cp_model
+import requests
+from requests.auth import HTTPBasicAuth
+
+
+def post_api(self, url, output_dict):
+    url = 'https://corners.synology.me:30006/woojin-dev490/' + url
+    # 요청 보내기
+    response = requests.post(url, json=output_dict, auth=HTTPBasicAuth(self.config['API_ID'], self.config['API_PASSWORD']), verify=False)
+
+    # 응답 확인
+    if response.status_code == 200:
+        print(f'접근 성공: 상태 코드 {response.status_code}')
+    else:
+        print(f'접근 실패: 상태 코드 {response.status_code} / 메세지 {response.text}')
 
 
 class Vehicles_result:
@@ -14,6 +28,7 @@ class Vehicles_result:
     def add_operation(self, operation, date):
         if operation not in self.operation_dict:
             self.operation_dict[operation] = date
+
 
 def save_results(self):
     # CP-SAT: status 체크
@@ -68,6 +83,8 @@ def save_results(self):
         with open(file_path, 'w', encoding='utf-8') as f:
             json.dump(for_json, f, ensure_ascii=False, indent=4)
         print(f"JSON 데이터가 '{file_path}' 파일로 성공적으로 저장되었습니다.")
+        if self.config['output_save_API']:
+            post_api(self, 'SNU/result', for_json)
     except IOError as e:
         print(f"파일 저장 중 오류가 발생했습니다: {e}")
     except TypeError as e:

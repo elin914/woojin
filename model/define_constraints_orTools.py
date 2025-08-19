@@ -52,15 +52,9 @@ def define_constraints(self):
                 if (self.operation_dict[operation_name].order < self.operation_dict[operation_name2].order
                         and (self.operation_dict[operation_name].test_operation or self.operation_dict[operation_name2].test_operation)):
                     self.model.Add(self.ends[(vehicle_name,operation_name)] <= self.ends[(vehicle_name2,operation_name2)])
-                    # self.model.Add(self.ends[(vehicle_name,operation_name)] <= self.starts[(vehicle_name2, operation_name2)])
-                # elif (self.operation_dict[operation_name].order < self.operation_dict[operation_name2].order
-                #       and self.operation_dict[operation_name].test_operation):
-                #     # self.model.Add(self.ends[(vehicle_name,operation_name)] <= self.starts[(vehicle_name2, operation_name2)])
-                #     self.model.Add(self.ends[(vehicle_name,operation_name)] <= self.ends[(vehicle_name2,operation_name2)])
                 # 그룹 내 선후행 제약
                 if (self.operation_dict[operation_name].order < self.operation_dict[operation_name2].order
                         and self.operation_dict[operation_name].department == self.operation_dict[operation_name2].department):
-                    # self.model.Add(self.ends[(vehicle_name,operation_name)] <= self.starts[(vehicle_name2, operation_name2)])
                     self.model.Add(self.ends[(vehicle_name,operation_name)] <= self.ends[(vehicle_name2,operation_name2)])
             if (vehicle_name != vehicle_name2 and operation_name == operation_name2 and
                     self.vehicle_dict[vehicle_name].order > 0 and self.vehicle_dict[vehicle_name2].order > 0 and

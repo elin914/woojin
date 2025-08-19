@@ -21,7 +21,7 @@ def load_api(self, url, save_data=False):
             with open('output.json', 'w', encoding='utf-8') as f:
                 json.dump(data, f, ensure_ascii=False, indent=4)
     else:
-        print(f'접근 실패: 상태 코드 {response.status_code}')
+        print(f'접근 실패: 상태 코드 {response.status_code} / 메세지 {response.text}')
         return False
     return data
 

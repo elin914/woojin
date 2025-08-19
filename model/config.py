@@ -14,6 +14,7 @@ def create_config():
     config['model'] = 'ortools'
 
     config['use_API'] = True
+    config['output_save_API'] = True
     config['API_ID'] = 'csdtpcp'
     config['API_PASSWORD'] = 'dtpcp!@'
     config['start_time'] = '2021-08-01'
