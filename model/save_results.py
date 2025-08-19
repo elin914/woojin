@@ -1,6 +1,20 @@
 import json
 import numpy as np
 import pandas as pd
+import requests
+from requests.auth import HTTPBasicAuth
+
+
+def post_api(self, url, output_dict):
+    url = 'https://corners.synology.me:30006/woojin-dev490/' + url
+    # 요청 보내기
+    response = requests.post(url, json=output_dict, auth=HTTPBasicAuth(self.config['API_ID'], self.config['API_PASSWORD']), verify=False)
+
+    # 응답 확인
+    if response.status_code == 200:
+        print(f'접근 성공: 상태 코드 {response.status_code}')
+    else:
+        print(f'접근 실패: 상태 코드 {response.status_code} / 메세지 {response.text}')
 
 
 class Vehicles_result:
@@ -55,6 +69,7 @@ def save_results(self):
                 # indent=4: JSON 파일을 사람이 읽기 쉽게 4칸 들여쓰기로 형식화합니다.
                 json.dump(for_json, f, ensure_ascii=False, indent=4)
             print(f"JSON 데이터가 '{file_path}' 파일로 성공적으로 저장되었습니다.")
+            post_api(self, 'SNU/result', for_json)
         except IOError as e:
             print(f"파일 저장 중 오류가 발생했습니다: {e}")
         except TypeError as e:
@@ -89,8 +104,7 @@ def save_results(self):
             results.append(result)
         results.append(counts)
         result_df = pd.DataFrame(results,
-                                 columns=['공정명', '담당공정', '검사공정여부', 'TC대상공정여부'] +
-                                         list(self.calendar.index_to_day_calendar_dict.keys()))
+                                 columns=['공정명', '담당공정', '검사공정여부', 'TC대상공정여부'] + list(self.calendar.index_to_day_calendar_dict.keys()))
         result_df.to_excel(self.config['folderpath'] + '/result_table.xlsx', index=False)
 
         # ## holiday를 제거하고 계산하도록 수정
