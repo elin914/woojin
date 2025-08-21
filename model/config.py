@@ -25,6 +25,8 @@ def create_config():
     config['data_file_path3'] = '../data/생관3-612-25-003_2025년 3월 일일생산계획 및 업체별 차종현황_Rev.00_25.02.28(확정).xlsx'
     # config['extra_data_file_path'] = '../data/02.의장·전기·기장 제작 계획 및 실적(24년 12월 예상실적).xlsm'
 
+    config['plot_network'] = False
+
     # 결과 저장
     config['ymd'] = time.strftime('%Y%m%d')
     config['hour'] = str(time.localtime().tm_hour)
@@ -37,7 +39,5 @@ def create_config():
 
     config_df = pd.json_normalize(config, sep='_').transpose()
     config_df.to_excel(config['folderpath'] + '/configuration.xlsx', index=True)
-
-    config['plot_network'] = True
 
     return config

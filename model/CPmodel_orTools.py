@@ -10,6 +10,7 @@ from define_objective_functions_orTools import *
 from save_results_orTools import *
 from plot_network import *
 
+
 class CPmodel:
     def __init__(self, config):
         self.config = config

@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import os
 from get_data import *
 
+
 def plot_network(self):
     data_proc4 = load_api(self, 'Processes/Seq?pcCd=PROC0004')
     df_proc4 = pd.DataFrame(data_proc4['data'])
@@ -111,10 +112,6 @@ def plot_network(self):
     plt.axis('off')
     plt.tight_layout()
 
-    # results_dir = Path(__file__).resolve().parent
-    # results_dir = results_dir / 'results'
-    # results_dir.mkdir(exist_ok=True)
-
     result_path = os.path.join(self.config['folderpath'], 'Activity_Network_57.png')
     plt.savefig(result_path, dpi=300, bbox_inches='tight')
     plt.close()
@@ -202,4 +199,3 @@ def plot_network(self):
         plt.savefig(sub_path, dpi=300, bbox_inches='tight')
         plt.close()
         print(f"[saved to: {sub_path}]")
-
