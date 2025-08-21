@@ -30,12 +30,14 @@ def create_config():
     config['hour'] = str(time.localtime().tm_hour)
     config['minute'] = str(time.localtime().tm_min)
     config['second'] = str(time.localtime().tm_sec)
-    config["folderpath"] = 'woojin/results/{0}_{1}h_{2}m_{3}s'.format(config['ymd'], config['hour'], config['minute'], config['second'])
+    config["folderpath"] = '../results/{0}_{1}h_{2}m_{3}s'.format(config['ymd'], config['hour'], config['minute'], config['second'])
 
     if not os.path.exists(config["folderpath"]):
-        os.mkdir(config["folderpath"])
+        os.makedirs(config["folderpath"], exist_ok=True)
 
     config_df = pd.json_normalize(config, sep='_').transpose()
     config_df.to_excel(config['folderpath'] + '/configuration.xlsx', index=True)
+
+    config['plot_network'] = True
 
     return config

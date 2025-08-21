@@ -8,6 +8,7 @@ from define_variables import *
 from define_constraints import *
 from define_objective_functions import *
 from save_results import *
+from plot_network import *
 
 
 class CPmodel:
@@ -69,3 +70,10 @@ class CPmodel:
         else:
             self.solution = self.model.solve(TimeLimit=self.config['run_time'])
         save_results(self)
+
+    def plot_network(self):
+        if self.config['plot_network']:
+            plot_network(self)
+            print("Plot Network Completed")
+        else:
+            print("No Network")

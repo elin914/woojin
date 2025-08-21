@@ -17,6 +17,7 @@ def main():
     model = CPmodel(config)
     model.get_data()
     model.run_model()
+    model.plot_network()
 
     print("run time:", np.round(time.time() - start_time, 5))
 

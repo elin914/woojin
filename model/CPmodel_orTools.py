@@ -8,7 +8,7 @@ from define_variables_orTools import *
 from define_constraints_orTools import *
 from define_objective_functions_orTools import *
 from save_results_orTools import *
-
+from plot_network import *
 
 class CPmodel:
     def __init__(self, config):
@@ -80,3 +80,10 @@ class CPmodel:
             print("Cannot find a feasible solution")
 
         save_results(self)
+
+    def plot_network(self):
+        if self.config['plot_network']:
+            plot_network(self)
+            print("Plot Network Completed")
+        else:
+            print("No Network")
