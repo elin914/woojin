@@ -71,7 +71,7 @@ def save_results(self):
                 json.dump(for_json, f, ensure_ascii=False, indent=4)
             print(f"JSON 데이터가 '{file_path}' 파일로 성공적으로 저장되었습니다.")
             if self.config['output_save_API']:
-                post_api(self, 'SNU/result', for_json)
+                post_api(self, 'SNU/result', [for_json])
         except IOError as e:
             print(f"파일 저장 중 오류가 발생했습니다: {e}")
         except TypeError as e:
