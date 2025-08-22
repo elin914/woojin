@@ -3,13 +3,22 @@ from networkx.drawing.nx_pydot import pydot_layout
 import matplotlib.pyplot as plt
 import os
 from get_data import *
+from class_definition import *
 
 def plot_network(self):
-    data_proc4 = load_api(self, 'Processes/Seq?pcCd=PROC0004')
-    df_proc4 = pd.DataFrame(data_proc4['data'])
-    df_proc4['pc'] = (df_proc4.index + 1).astype(str)
+    data = []
+    for operation_name, operation in self.operation_dict.items():
+        pc = operation_name
+        pctp = operation.department
+        examchek = operation.test_operation
+        data.append((pc, pctp, examchek))
 
-    data = list(df_proc4[['pc', 'pcTp', 'examCheck']].itertuples(index=False, name=None))
+
+    # data_proc4 = load_api(self, 'Processes/Seq?pcCd=PROC0004')
+    # df_proc4 = pd.DataFrame(data_proc4['data'])
+    # df_proc4['pc'] = (df_proc4.index + 1).astype(str)
+    #
+    # data = list(df_proc4[['pc', 'pcTp', 'examCheck']].itertuples(index=False, name=None))
 
     stops_idxs = [i for i, (_, _, exam) in enumerate(data) if exam == 1]
 
@@ -24,7 +33,7 @@ def plot_network(self):
 
     elif len(initial) == 1:
         act = initial[0]
-        edges.append((act[0], first_stop))
+        edges.append((act, first_stop))
 
     else:
         groups = {}
@@ -87,25 +96,39 @@ def plot_network(self):
         G.add_node(pc, pcTp=pctp, examCheck=exam)
     G.add_edges_from(edges)
 
-    colors = {}
-    for pc, pctp, exam in data:
-        if exam == 1:
-            colors[pc] = "pink"
-        elif pctp == 1:
-            colors[pc] = "lightblue"
-        elif pctp == 2:
-            colors[pc] = "lightgreen"
-        elif pctp == 3:
-            colors[pc] = "yellow"
+    def make_color_from_grapgh(G):
+        def color_for(n: str) -> str:
+            attrs = G.nodes[n]
+            exam = attrs.get('examCheck', 0)
+            pctp = attrs.get('pcTp', 0) or 0
+            try:
+                pctp = int(pctp)
+            except (TypeError, ValueError):
+                pctp = 0
 
+            if exam == 1:
+                return "pink"
+            elif pctp == 1:
+                return "lightblue"
+            elif pctp == 2:
+                return "lightgreen"
+            elif pctp == 3:
+                return "yellow"
+            return "red"
+        return color_for
+
+    color_for = make_color_from_grapgh(G)
+    colors = {n: color_for(n) for n in G.nodes()}
     node_colors = [colors[n] for n in G.nodes()]
 
     pos = pydot_layout(G, prog='dot')
     pos = {n: (-y, x) for n, (x, y) in pos.items()}
 
+    labels = {n: n.replace("operation", "") for n in G.nodes()}
+
     plt.figure(figsize=(17, 2))
     nx.draw_networkx_nodes(G, pos, node_size=200, node_color=node_colors, edgecolors='black', linewidths=1.2)
-    nx.draw_networkx_labels(G, pos, font_size=7, font_weight='bold')
+    nx.draw_networkx_labels(G, pos, labels=labels, font_size=7, font_weight='bold')
     nx.draw_networkx_edges(G, pos, arrowstyle='->', arrowsize=10, width=1.2)
 
     plt.axis('off')
@@ -127,67 +150,36 @@ def plot_network(self):
     day_to_index_calendar_dict = {date: i for i, date in enumerate(date_range)}
 
     vehicle_dict = {}  # 차량 아이디: 공정분류 명
-    plan_date = {}  # 차량 아이디: (공정 이름: 날짜)
+    plan_date = {}  # 차량 아이디: {공정 이름: 날짜}
 
-    df_vehicle = pd.DataFrame(load_api(self, 'Cars/e672bd1e-5ed0-4baa-9cbd-50db20ea24db?allYn=Y')['data'])
-    for i, row in df_vehicle.iterrows():
-        data_temp = load_api(self, 'WorkPlan/e672bd1e-5ed0-4baa-9cbd-50db20ea24db?carId=' + row['carId'])
-        if data_temp['code'] == 10:
-            continue
-        df_temp = pd.DataFrame(data_temp['data'])
-        df_temp = df_temp[pd.to_datetime(df_temp['planDate']) >= self.start_time]
-        df_temp = df_temp[pd.to_datetime(df_temp['planDate']) <= self.end_time]
-        df_temp = df_temp[df_temp['pcId'].isin(df_proc4['pcId'])]
-        if df_temp.shape[0] == 0:
-            continue
-        vehicle_dict[row['carCd']] = list(df_temp['pcNm'])
-        df_temp['day_idx'] = df_temp['planDate'].map(day_to_index_calendar_dict)
-        plan_date[row['carCd']] = {str(pc): int(date) for pc, date in zip(df_temp['pcNm'], df_temp['day_idx'])}
+    for vehicle_name, vehicle in self.vehicle_dict.items():
+        vehicle_dict[vehicle_name] = vehicle.operation_list
+        plan_date[vehicle_name] = vehicle.operation_dict
 
-    for vehicle_name, operations in vehicle_dict.items():
-        data = []
-        edges = []
+        data_sub = []
         G = nx.MultiDiGraph()
-        for operation in operations:
-            sub = df_proc4.loc[df_proc4['pcNm'] == operation, ['pc', 'pcTp', 'examCheck']]
-            operation_data = list(sub.itertuples(index=False, name=None))
-            data.extend(operation_data)
+        for operation in vehicle.operation_list:
+            pc_sub = operation
+            pctp_sub = self.operation_dict[operation].department
+            examcheck_sub = self.operation_dict[operation].test_operation
+            data_sub.append((pc_sub, pctp_sub, examcheck_sub))
 
-    def node_color_for(attrs):
-        if attrs.get('examCheck', 0) == 1:
-            return 'pink'
-        tp = attrs.get('pcTp')
-        return {1: 'lightblue', 2: 'lightgreen', 3: 'yellow'}.get(tp, 'lightgray')
+        remain = {str(pc) for pc, _, _ in data_sub if str(pc) in G_full.nodes()}
 
-    pc_to_pcNm = dict(df_proc4[['pc', 'pcNm']].values)
+        labels_sub = {n: plan_date[vehicle_name][n] for n in remain}
 
-    for vehicle_name, operations in list(vehicle_dict.items()):
-        raw = []
-        for operation in operations:
-            sub = df_proc4.loc[df_proc4['pcNm'] == operation, ['pc', 'pcTp', 'examCheck']]
-            operation_data = list(sub.itertuples(index=False, name=None))
-            raw.extend(operation_data)
-
-        remain = {str(pc) for pc, _, _ in raw if str(pc) in G_full.nodes()}
-
-        labels = {}
-        pcNm_dayidx = plan_date.get(vehicle_name, {})
-        for pc in remain:
-            name = pc_to_pcNm[pc]
-            idx = pcNm_dayidx[name]
-            if idx is not None:
-                labels[pc] = idx
-            else:
-                labels[pc] = None
 
         plt.figure(figsize=(17, 2))
         nx.draw_networkx_edges(G_full, pos_full, width=1.2, arrows=False)
         nx.draw_networkx_nodes(G_full, pos_full, node_size=200, node_color='lightgray', edgecolors='none')
 
-        remain_colors = [node_color_for(G_full.nodes[n]) for n in remain]
+        color_for = make_color_from_grapgh(G_full)
+        remain_colors = [color_for(n) for n in remain]
+        nx.draw_networkx_nodes(G_full, pos_full, node_size=220, node_color='lightgray',
+                               edgecolors='black', linewidths=1.2)
         nx.draw_networkx_nodes(G_full, pos_full, nodelist=list(remain), node_size=220, node_color=remain_colors,
                                edgecolors='black', linewidths=1.2)
-        nx.draw_networkx_labels(G_full, pos_full, labels=labels, font_size=7, font_weight='bold')
+        nx.draw_networkx_labels(G_full, pos_full, labels=labels_sub, font_size=7, font_weight='bold')
 
         remain_edges = [(u, v) for (u, v) in G_full.edges() if u in remain and v in remain]
         nx.draw_networkx_edges(G_full, pos_full, edgelist=remain_edges, width=1.2, arrowstyle='->', arrowsize=10)
