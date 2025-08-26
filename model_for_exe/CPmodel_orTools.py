@@ -52,14 +52,23 @@ class CPmodel:
         self.step_function_by_vehicle_dict = dict()
 
     def get_data(self):
+        print("\n===== API를 통한 데이터 요청 시작 =====")
         get_data_from_api(self)
-        print("Load Data Completed")
+        print("===== API를 통한 데이터 로딩 완료! =====")
 
     def run_model(self):
+        print("===== 최적화 모델 시작 =====")
+        print("\n==== 변수 모델링 진행 중... ====")
         define_variables(self)
+        print("==== 변수 모델링 완료! ====")
+        print("\n==== 제약 조건 모델링 진행 중... ====")
         define_constraints(self)
+        print("==== 제약 조건 모델링 완료! ====")
+        print("\n==== 목적 함수 모델링 진행 중... ====")
         define_object_functions(self)
+        print("==== 목적 함수 모델링 완료! ====")
 
+        print("\n==== 최적화 모델 해 탐색 시작 ====")
         solver = cp_model.CpSolver()
         solver.parameters.log_search_progress = True
         solver.parameters.max_time_in_seconds = self.config['run_time']
@@ -68,10 +77,12 @@ class CPmodel:
 
         self.solver = solver
         self.status = status
-
+        print("==== 최적화 모델 해 탐색 완료 ====")
         if status in (cp_model.OPTIMAL, cp_model.FEASIBLE):
-            print("Solution found")
+            print("해를 발견했습니다.")
+            print("\n===== 결과 정리 시작 =====")
+            save_results(self)
+            print("===== 결과 정리 완료 =====")
         else:
-            print("Cannot find a feasible solution")
+            print("해를 발견하지 못했습니다.")
 
-        save_results(self)

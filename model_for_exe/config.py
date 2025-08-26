@@ -49,6 +49,5 @@ def load_config():
         config_df.to_excel(config['folderpath'] + '/configuration.xlsx', index=True)
     except Exception as e:
         print(f"엑셀 저장 중 오류 발생: {e}")
-    print("Load Config Completed")
 
     return config

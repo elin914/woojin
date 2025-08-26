@@ -27,6 +27,7 @@ def load_api(self, url, save_data=False):
 
 
 def get_data_from_api(self):
+    print("==== 공정 데이터 요청 중... ====")
     self.df_process = pd.DataFrame(load_api(self, 'Processes/Seq')['data'])
     self.df_process = self.df_process[(self.df_process['pcCd'] == 'PROC0004') | (self.df_process['pcCd'] == 'PROC0005')]
 
@@ -41,8 +42,9 @@ def get_data_from_api(self):
     self.operation_id_to_key_dict = {value.id: key for key, value in self.operation_dict.items()}
     self.same_sequence_constraint = [[9, 10], [21, 22], [24, 25], [26, 27], [39, 40, 41],
                                      [42, 43], [44, 45, 46, 47], [48, 49, 50]]
-    print("Load Operation Completed")
+    print("==== 공정 데이터 로딩 완료! ====")
 
+    print("\n==== 날짜 데이터 요청 중... ====")
     self.calendar = Calendar()
     date_range = list(pd.date_range(start=self.start_time, end=self.end_time, freq='D'))
     self.calendar.index_to_day_calendar_dict = {i: date for i, date in enumerate(date_range)}
@@ -57,8 +59,9 @@ def get_data_from_api(self):
     #     self.calendar.holiday.append(self.calendar.day_to_index_calendar_dict[holiday])
     # self.calendar.holiday = sorted(self.calendar.holiday)
     self.end_time_index = max(self.calendar.index_to_day_calendar_dict.keys())
-    print("Load calendar Completed")
+    print("==== 날짜 데이터 로딩 완료! ====")
 
+    print("\n==== 프로젝트 내 전체 차량 데이터 요청 중... ====")
     df_vehicle = pd.DataFrame(load_api(self, 'Cars/' + self.config['project_id'] + '?allYn=Y')['data'])
     df_har = pd.DataFrame(load_api(self, 'WorkPlan/harness/' + self.config['project_id'])['data'])
     df_har['planDate'] = pd.to_datetime(df_har['planDate'])
@@ -66,7 +69,10 @@ def get_data_from_api(self):
     df_har['harnessSeq'] = df_har['planDate'].rank(method='dense').astype(int)
     self.df_vehicle = pd.merge(df_vehicle, df_har, on='carId', how='left').fillna(0)
     self.df_vehicle['harnessSeq'] = self.df_vehicle['harnessSeq'].astype(int)
-    # self.df_vehicle = self.df_vehicle[self.df_vehicle['harnessSeq'] != 0]
+    print("==== 프로젝트 내 전체 차량 데이터 로딩 완료! ====")
+
+    print("\n==== 차량 별 데이터 요청 중... ====")
+    print("시간이 다소 소요될 수도 있습니다...")
     for i, row in self.df_vehicle.iterrows():
         data_temp = load_api(self, 'WorkPlan/' + self.config['project_id'] + '?carId=' + row['carId'])
         if data_temp['code'] == 10:
@@ -88,13 +94,13 @@ def get_data_from_api(self):
             vehicle.operation_list.append(operation)
         vehicle.operation_dict = {key: vehicle.operation_dict[key] for key in sorted([key for key in vehicle.operation_dict.keys()], key=lambda x: int(x.replace('operation', '')))}
         vehicle.min_operation_name = min(vehicle.operation_dict, key=vehicle.operation_dict.get)
-    print("Load Vehicle Completed")
+    print("==== 차량 별 데이터 로딩 완료! ====")
 
     self.load_step_dict = {index: 0 for index in self.calendar.index_to_day_calendar_dict}
     for vehicle_name, vehicle in self.vehicle_dict.items():
         for operation_name, date in vehicle.operation_dict.items():
             self.load_step_dict[date] += 1
-    print(self.load_step_dict)
+    # print(self.load_step_dict)
     for date in [key for key, value in self.load_step_dict.items() if value == 0]:
         if date not in self.calendar.holiday:
             self.calendar.holiday.append(date)

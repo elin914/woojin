@@ -14,9 +14,9 @@ def post_api(self, url, output_dict):
 
     # 응답 확인
     if response.status_code == 200:
-        print(f'JSON 데이터가 성공적으로 업로드 되었습니다.')
+        print("==== json 파일 업로드 완료! ====")
     else:
-        print(f'JSON 데이터 업로드에 실패했습니다. 상태 코드 {response.status_code} / 메세지 {response.text}')
+        print(f"==== json 파일 업로드 실패: 상태 코드 {response.status_code} / 메세지 {response.text}")
 
 
 class Vehicles_result:
@@ -32,11 +32,6 @@ class Vehicles_result:
 
 
 def save_results(self):
-    # CP-SAT: status 체크
-    if getattr(self, "status", None) not in (cp_model.OPTIMAL, cp_model.FEASIBLE):
-        print("No feasible solution to save.")
-        return
-
     solver = self.solver  # 위에서 self.solver에 넣어둠
 
     # peak_load / min_load 출력 (존재할 때만)
@@ -75,18 +70,21 @@ def save_results(self):
         }
     }
 
+    print("==== 최적화 결과를 json 파일로 변환 중... ====")
     file_path = self.config['folderpath'] + '/schedule_optimization_output.json'
     try:
         with open(file_path, 'w', encoding='utf-8') as f:
             json.dump(for_json, f, ensure_ascii=False, indent=4)
-        print(f"JSON 데이터가 '{file_path}' 파일로 성공적으로 저장되었습니다.")
+        print(f"==== json 파일 저장 완료! ====")
+        print("\n==== API로 json 파일 업로드 시도 중... ====")
         post_api(self, 'SNU/result', [for_json])
     except IOError as e:
-        print(f"파일 저장 중 오류가 발생했습니다: {e}")
+        print(f"==== 파일 저장 중 오류가 발생했습니다: {e} ====")
     except TypeError as e:
         # json.dump가 직렬화할 수 없는 객체를 만났을 때 발생 (예: __dict__로 처리 안 된 사용자 객체)
-        print(f"JSON 직렬화 중 오류가 발생했습니다: {e}")
+        print(f"==== json 직렬화 중 오류가 발생했습니다: {e} ====")
 
+    print("\n==== 최적화 결과를 엑셀 파일로 변환 중... ====")
     results = []
     days = {'공정명': None, '담당공정': None, '검사공정여부': None, 'TC대상공정여부': None}
     for i in list(self.calendar.index_to_day_calendar_dict.keys()):
@@ -121,7 +119,9 @@ def save_results(self):
                                 columns=['공정명', '담당공정', '검사공정여부', 'TC대상공정여부'] +
                                         list(self.calendar.index_to_day_calendar_dict.keys()))
     result_df.to_excel(self.config['folderpath'] + '/result_table.xlsx', index=False)
+    print("==== 최적화 결과 엑셀 파일 저장 완료! ====")
 
+    print("\n==== 결과 지표 저장 중... ====")
     # ## holiday를 제거하고 계산하도록 수정
     metrics_path = os.path.join(self.config['folderpath'], 'performance_metrics.txt')
     try:
@@ -155,7 +155,8 @@ def save_results(self):
             f.write(f"최적화 결과 부하 평균: {np.round(np.mean(daily_loads_output), 3)}\n")
             f.write(f"최적화 결과 부하 분산: {np.round(np.var(daily_loads_output), 3)}\n")
 
-        print(f"결과 지표가 '{metrics_path}' 파일로 저장되었습니다.")
+        print("==== 결과 지표 저장 완료! ====")
 
     except Exception as e:
-        print(f"결과 지표 저장 중 오류가 발생했습니다: {e}")
+        print(f"==== 결과 지표 저장 중 오류 발생: {e} ====")
+
