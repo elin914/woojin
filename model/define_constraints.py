@@ -20,14 +20,14 @@ def define_constraints(self):
                 # self.model.add(self.model.start_of(var) == self.vehicle_dict[vehicle_name].operation_dict[operation_name])
         # 흡음재 취부 일정 고정
         if self.operation_dict[operation_name].order == 2:
-            self.model.Add(self.model.start_of(var) == self.operation0_dict[vehicle_name])
+            self.model.add(self.model.start_of(var) == self.operation0_dict[vehicle_name])
         # 토요일 검사 불가능
         if self.operation_dict[operation_name].test_operation:
             for saturday_index in self.calendar.saturday:
-                self.model.Add(self.model.start_of(var) != saturday_index)
+                self.model.add(self.model.start_of(var) != saturday_index)
         # 휴일 작업 불가능
         for holiday_index in self.calendar.holiday:
-            self.model.Add(self.model.start_of(var) != holiday_index)
+            self.model.add(self.model.start_of(var) != holiday_index)
         # 공정 별 capacity, 동시 작업 시 추가하지 않음
         same_sequence_condition = True
         for same_sequence in self.same_sequence_constraint:
@@ -35,7 +35,7 @@ def define_constraints(self):
                 same_sequence_condition = False
                 if (vehicle_name,
                     self.operation_list[same_sequence[0]]) in self.operation_var_dict_by_vehicle_operation_dict:
-                    self.model.Add(self.model.start_of(var) == self.model.start_of(
+                    self.model.add(self.model.start_of(var) == self.model.start_of(
                         self.operation_var_dict_by_vehicle_operation_dict[
                             (vehicle_name, self.operation_list[same_sequence[0]])]))
                 break
@@ -57,7 +57,7 @@ def define_constraints(self):
                 # 공정이 끝나야 검사 수행 가능
                 if (self.operation_dict[operation_name].order < self.operation_dict[operation_name2].order
                         and (self.operation_dict[operation_name].test_operation or self.operation_dict[operation_name2].test_operation)):
-                    self.model.Add(self.model.end_of(var) <= self.model.end_of(var2))
+                    self.model.add(self.model.end_of(var) <= self.model.end_of(var2))
                     # self.model.add(self.model.end_of(var) <= self.model.start_of(var2))
                 # elif (self.operation_dict[operation_name].order < self.operation_dict[operation_name2].order
                 #       and self.operation_dict[operation_name].test_operation):
@@ -67,14 +67,14 @@ def define_constraints(self):
                 if (self.operation_dict[operation_name].order < self.operation_dict[operation_name2].order
                         and self.operation_dict[operation_name].department == self.operation_dict[operation_name2].department):
                     # self.model.add(self.model.end_of(var) <= self.model.start_of(var2))
-                    self.model.Add(self.model.end_of(var) <= self.model.end_of(var2))
+                    self.model.add(self.model.end_of(var) <= self.model.end_of(var2))
             if (vehicle_name != vehicle_name2 and operation_name == operation_name2 and
                     self.vehicle_dict[vehicle_name].order > 0 and self.vehicle_dict[vehicle_name2].order > 0 and
                     self.vehicle_dict[vehicle_name].order < self.vehicle_dict[vehicle_name2].order - 2):
-                self.model.Add(self.model.start_of(var) <= self.model.start_of(var2))
+                self.model.add(self.model.start_of(var) <= self.model.start_of(var2))
 
     # 공정 별 capacity 제약
     for step_function_by_operation in self.step_function_by_operation_dict.values():
-        self.model.Add(step_function_by_operation <= 2)
+        self.model.add(step_function_by_operation <= 2)
     for step_function_by_vehicle in self.step_function_by_vehicle_dict.values():
-        self.model.Add(step_function_by_vehicle <= 2)
+        self.model.add(step_function_by_vehicle <= 2)

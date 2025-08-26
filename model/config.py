@@ -11,7 +11,7 @@ def create_config():
     config['search_method'] = 'single_solution'
     config['load_max'] = 33
     # ortools, ilog
-    config['model'] = 'ortools'
+    config['model'] = 'ilog'
 
     config['use_API'] = True
     config['output_save_API'] = True

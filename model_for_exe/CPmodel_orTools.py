@@ -1,6 +1,4 @@
 import numpy as np
-
-np.bool = np.bool_
 from ortools.sat.python import cp_model
 import pandas as pd
 from get_data import *

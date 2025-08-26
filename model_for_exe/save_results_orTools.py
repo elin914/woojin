@@ -14,9 +14,9 @@ def post_api(self, url, output_dict):
 
     # 응답 확인
     if response.status_code == 200:
-        print(f'접근 성공: 상태 코드 {response.status_code}')
+        print(f'JSON 데이터가 성공적으로 업로드 되었습니다.')
     else:
-        print(f'접근 실패: 상태 코드 {response.status_code} / 메세지 {response.text}')
+        print(f'JSON 데이터 업로드에 실패했습니다. 상태 코드 {response.status_code} / 메세지 {response.text}')
 
 
 class Vehicles_result:
@@ -41,10 +41,7 @@ def save_results(self):
 
     # peak_load / min_load 출력 (존재할 때만)
     if hasattr(self, "peak_load"):
-        print("peak_load:", self.solver.Value(self.peak_load))
-
-    if hasattr(self, "min_load"):
-        print("min_load:",  self.solver.Value(self.min_load))
+        print("최적화 결과 - 최대 부하:", self.solver.Value(self.peak_load))
 
     # interval에서 start를 직접 못 꺼내므로, 우리가 저장한 start IntVar로 꺼내기
     for (vehicle_name, operation), _iv in self.operation_var_dict_by_vehicle_operation_dict.items():
@@ -131,10 +128,7 @@ def save_results(self):
         with open(metrics_path, 'w', encoding='utf-8') as f:
             # peak_load / min_load 출력 (존재할 때만)
             if hasattr(self, "peak_load"):
-                f.write(f"peak_load: {self.solver.Value(self.peak_load)}\n")
-
-            if hasattr(self, "min_load"):
-                f.write(f"min_load: {self.solver.Value(self.min_load)}\n")
+                f.write(f"max_load: {self.solver.Value(self.peak_load)}\n")
 
             f.write("-------------------------------------------------------\n")
 
@@ -142,8 +136,7 @@ def save_results(self):
             f.write(f"입력 시 일별 부하: {list(self.load_step_dict.values())}\n")
 
             # 주말/휴일 제외 평균, 분산 계산
-            daily_loads_input = [value for key, value in self.load_step_dict.items() if
-                                 key not in self.calendar.holiday and key not in self.calendar.saturday]
+            daily_loads_input = [value for key, value in self.load_step_dict.items() if key not in self.calendar.holiday]
             f.write(f"입력 시 부하 평균: {np.round(np.mean(daily_loads_input), 3)}\n")
             f.write(f"입력 시 부하 분산: {np.round(np.var(daily_loads_input), 3)}\n")
 
@@ -158,8 +151,7 @@ def save_results(self):
             f.write(f"최적화 결과 일별 부하: {list(counts.values())}\n")
 
             # 주말/휴일 제외 평균, 분산 계산
-            daily_loads_output = [value for key, value in counts.items() if
-                                  key not in self.calendar.holiday and key not in self.calendar.saturday]
+            daily_loads_output = [value for key, value in counts.items() if key not in self.calendar.holiday]
             f.write(f"최적화 결과 부하 평균: {np.round(np.mean(daily_loads_output), 3)}\n")
             f.write(f"최적화 결과 부하 분산: {np.round(np.var(daily_loads_output), 3)}\n")
 
