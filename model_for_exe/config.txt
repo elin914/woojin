@@ -1,9 +1,9 @@
-# 결과 저장 경로를 입력하세요.
+# 결과 저장 경로를 설정합니다.
 folderpath=snu_output
 
-# API 접속 정보를 입력하세요.
+# API 접속 정보를 설정합니다.
 API_ID=csdtpcp
 API_PASSWORD=dtpcp!@
 
-# 프로젝트 id를 입력하세요.
+# 프로젝트 id를 설정합니다.
 project_id=e672bd1e-5ed0-4baa-9cbd-50db20ea24db
