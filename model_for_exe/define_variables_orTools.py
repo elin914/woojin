@@ -1,4 +1,6 @@
 def define_variables(self):
+    self.max_load = self.model.NewIntVar(0, self.capacity, f'max_load')
+    self.min_load = self.model.NewIntVar(0, self.capacity, f'min_load')
     for vehicle_name, vehicle in self.vehicle_dict.items():
         for operation_name in vehicle.operation_list:
             duration = 1

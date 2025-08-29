@@ -3,13 +3,16 @@ import os
 import time
 
 
-def load_config():
+def load_config(start_time, start_date, end_date):
     """
     config.txt 파일을 읽어와 설정을 로드하고,
     동적인 결과 폴더 경로를 추가하여 반환하는 함수.
     """
-    config = {}
-
+    config = dict()
+    config['program_start_time'] = start_time
+    config['start_date'] = start_date
+    config['end_date'] = end_date
+    config['run_time'] = 300
     try:
         with open('config.txt', 'r', encoding='utf-8') as f:
             for line in f:
@@ -25,21 +28,12 @@ def load_config():
         print("오류: config.txt 파일이 존재하지 않습니다.")
         return None
 
-    # 텍스트 값들을 적절한 데이터 타입으로 변환
-    try:
-        # 정수(int)로 변환
-        config['run_time'] = int(config['run_time'])
-        config['load_max'] = int(config['load_max'])
-    except (KeyError, ValueError) as e:
-        print(f"오류: config.txt 파일의 형식이 올바르지 않습니다. ({e})")
-        return None
-
-    config['ymd'] = time.strftime('%Y%m%d')
-    config['hour'] = str(time.localtime().tm_hour)
-    config['minute'] = str(time.localtime().tm_min)
-    config['second'] = str(time.localtime().tm_sec)
-    config["folderpath"] = '{0}_{1}h_{2}m_{3}s'.format(config['ymd'], config['hour'], config['minute'],
-                                                                  config['second'])
+    # config['ymd'] = time.strftime('%Y%m%d')
+    # config['hour'] = str(time.localtime().tm_hour)
+    # config['minute'] = str(time.localtime().tm_min)
+    # config['second'] = str(time.localtime().tm_sec)
+    # config["folderpath"] = '{0}_{1}h_{2}m_{3}s'.format(config['ymd'], config['hour'], config['minute'],
+    #                                                               config['second'])
 
     if not os.path.exists(config["folderpath"]):
         os.makedirs(config["folderpath"], exist_ok=True)

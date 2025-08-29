@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import requests
 from requests.auth import HTTPBasicAuth
 import urllib3
@@ -101,6 +102,8 @@ def get_data_from_api(self):
         for operation_name, date in vehicle.operation_dict.items():
             self.load_step_dict[date] += 1
     # print(self.load_step_dict)
+    all_values = list(self.load_step_dict.values())
+    self.capacity = int((max(all_values) + np.mean([value for value in all_values if value > 0])) / 2)
     for date in [key for key, value in self.load_step_dict.items() if value == 0]:
         if date not in self.calendar.holiday:
             self.calendar.holiday.append(date)

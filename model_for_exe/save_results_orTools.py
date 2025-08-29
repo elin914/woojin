@@ -5,6 +5,7 @@ from ortools.sat.python import cp_model
 import requests
 from requests.auth import HTTPBasicAuth
 import os
+import time
 
 
 def post_api(self, url, output_dict):
@@ -19,16 +20,16 @@ def post_api(self, url, output_dict):
         print(f"==== json 파일 업로드 실패: 상태 코드 {response.status_code} / 메세지 {response.text}")
 
 
-class Vehicles_result:
-    def __init__(self, vehicle_name, type_TC):
-        self.vehicle_name = vehicle_name
-        self.type_TC = type_TC
-        self.operation_list = list()
-        self.operation_dict = dict()
-
-    def add_operation(self, operation, date):
-        if operation not in self.operation_dict:
-            self.operation_dict[operation] = date
+# class Vehicles_result:
+#     def __init__(self, vehicle_name, type_TC):
+#         self.vehicle_name = vehicle_name
+#         self.type_TC = type_TC
+#         self.operation_list = list()
+#         self.operation_dict = dict()
+#
+#     def add_operation(self, operation, date):
+#         if operation not in self.operation_dict:
+#             self.operation_dict[operation] = date
 
 
 def save_results(self):
@@ -126,6 +127,7 @@ def save_results(self):
     metrics_path = os.path.join(self.config['folderpath'], 'performance_metrics.txt')
     try:
         with open(metrics_path, 'w', encoding='utf-8') as f:
+            f.write(f"프로그램 총 실행 시간: {np.round(time.time() - self.config['program_start_time'], 5)}\n")
             # peak_load / min_load 출력 (존재할 때만)
             if hasattr(self, "peak_load"):
                 f.write(f"max_load: {self.solver.Value(self.peak_load)}\n")

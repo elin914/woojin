@@ -16,11 +16,12 @@ class CPmodel:
         self.status = None
         self.search_start_time = None
         self.solution = None
-        self.start_time = pd.to_datetime(self.config['start_time'])
-        self.end_time = pd.to_datetime(self.config['end_time'])
+        self.start_time = self.config['start_date']
+        self.end_time = self.config['end_date']
         self.start_time_index = 0
         # self.end_time_index = 31
         self.end_time_index = None
+        self.load_max = None
 
         self.df_process = pd.DataFrame()
         self.df_vehicle = pd.DataFrame()
@@ -36,14 +37,14 @@ class CPmodel:
         self.operation0_dict = dict()  # vehicle_name: date
         self.load_step_dict = list()
         
-        self.capacity = int(self.config['load_max'])
+        self.capacity = None
         
         self.starts = {}
         self.ends = {}
         self.intervals = {}
-        
-        self.max_load = self.model.NewIntVar(0, self.config['load_max'], f'max_load')
-        self.min_load = self.model.NewIntVar(0, self.config['load_max'], f'min_load')
+
+        self.max_load = None
+        self.min_load = None
 
         self.load_step_function = None
         self.load_step_function2 = None
@@ -83,6 +84,7 @@ class CPmodel:
             print("\n===== 결과 정리 시작 =====")
             save_results(self)
             print("===== 결과 정리 완료 =====")
+            return True
         else:
             print("해를 발견하지 못했습니다.")
-
+            return False
