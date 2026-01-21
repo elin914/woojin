@@ -32,7 +32,7 @@ class Vehicles_result:
 
 def save_results(self):
     # CP-SAT: status 체크
-    if getattr(self, "status", None) not in (cp_model.OPTIMAL, cp_model.FEASIBLE):
+    if getattr(self, "solution", None) not in (cp_model.OPTIMAL, cp_model.FEASIBLE):
         print("No feasible solution to save.")
         return
 

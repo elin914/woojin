@@ -16,7 +16,6 @@ class CPmodel:
         self.config = config
         self.model = cp_model.CpModel()
         self.solver = None
-        self.status = None
         self.search_start_time = None
         self.solution = None
         self.start_time = pd.to_datetime(self.config['start_time'])
@@ -70,12 +69,12 @@ class CPmodel:
         solver.parameters.log_search_progress = True
         solver.parameters.max_time_in_seconds = self.config['run_time']
 
-        status = solver.Solve(self.model)
+        sol = solver.Solve(self.model)
 
         self.solver = solver
-        self.status = status
+        self.solution = sol
 
-        if status in (cp_model.OPTIMAL, cp_model.FEASIBLE):
+        if sol in (cp_model.OPTIMAL, cp_model.FEASIBLE):
             print("Solution found")
         else:
             print("Cannot find a feasible solution")

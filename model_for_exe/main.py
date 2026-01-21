@@ -22,6 +22,7 @@ def main():
         model = CPmodel(config)
         model.get_data()
         solve = model.run_model()
+        model.plot_network()
         print("==== 최적화 프로그램 종료 ====")
         if solve:
             return 0

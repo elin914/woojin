@@ -2,6 +2,7 @@ import json
 import numpy as np
 import pandas as pd
 from ortools.sat.python import cp_model
+import matplotlib.pyplot as plt
 import requests
 from requests.auth import HTTPBasicAuth
 import os
@@ -138,6 +139,7 @@ def save_results(self):
             f.write(f"입력 시 일별 부하: {list(self.load_step_dict.values())}\n")
 
             # 주말/휴일 제외 평균, 분산 계산
+            x = [key for key, value in self.load_step_dict.items() if key not in self.calendar.holiday]
             daily_loads_input = [value for key, value in self.load_step_dict.items() if key not in self.calendar.holiday]
             f.write(f"입력 시 부하 평균: {np.round(np.mean(daily_loads_input), 3)}\n")
             f.write(f"입력 시 부하 분산: {np.round(np.var(daily_loads_input), 3)}\n")
@@ -158,6 +160,31 @@ def save_results(self):
             f.write(f"최적화 결과 부하 분산: {np.round(np.var(daily_loads_output), 3)}\n")
 
         print("==== 결과 지표 저장 완료! ====")
+
+        plt.figure(figsize=(12, 6))
+        plt.subplot(2, 1, 1)
+        plt.plot(range(len(x)), daily_loads_input, marker='o', label='Daily workload')
+        plt.axhline(y=np.round(np.mean(daily_loads_output), 3), color='r', linestyle='--', label=f'Average')
+        plt.xticks(ticks=range(len(x)), labels=x)
+        plt.xlabel('Date')
+        plt.ylabel('Workload')
+        plt.title('Daily Workload of Actual Data(up) & Optimization Results(down)')
+        plt.legend(loc='upper left')
+        plt.grid(True)
+        y_limit = plt.ylim()
+
+        plt.subplot(2, 1, 2)
+        plt.plot(range(len(x)), daily_loads_output, marker='o', label='Daily workload')
+        plt.axhline(y=np.round(np.mean(daily_loads_output), 3), color='r', linestyle='--', label=f'Average')
+        plt.xticks(ticks=range(len(x)), labels=x)
+        plt.xlabel('Date')
+        plt.ylabel('Workload')
+        plt.ylim(y_limit)
+        plt.legend(loc='upper left')
+        plt.grid(True)
+        plt.tight_layout()
+        plt.savefig(self.config['folderpath'] + '/workload_graph.png')
+        # plt.show()
 
     except Exception as e:
         print(f"==== 결과 지표 저장 중 오류 발생: {e} ====")

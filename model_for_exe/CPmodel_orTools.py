@@ -6,6 +6,7 @@ from define_variables_orTools import *
 from define_constraints_orTools import *
 from define_objective_functions_orTools import *
 from save_results_orTools import *
+from plot_network import *
 
 
 class CPmodel:
@@ -13,7 +14,6 @@ class CPmodel:
         self.config = config
         self.model = cp_model.CpModel()
         self.solver = None
-        self.status = None
         self.search_start_time = None
         self.solution = None
         self.start_time = self.config['start_date']
@@ -74,12 +74,12 @@ class CPmodel:
         solver.parameters.log_search_progress = True
         solver.parameters.max_time_in_seconds = self.config['run_time']
 
-        status = solver.Solve(self.model)
+        sol = solver.Solve(self.model)
 
         self.solver = solver
-        self.status = status
+        self.solution = sol
         print("==== 최적화 모델 해 탐색 완료 ====")
-        if status in (cp_model.OPTIMAL, cp_model.FEASIBLE):
+        if sol in (cp_model.OPTIMAL, cp_model.FEASIBLE):
             print("해를 발견했습니다.")
             print("\n===== 결과 정리 시작 =====")
             save_results(self)
@@ -88,3 +88,6 @@ class CPmodel:
         else:
             print("해를 발견하지 못했습니다.")
             return False
+
+    def plot_network(self):
+        plot_network(self)
